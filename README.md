@@ -8,7 +8,7 @@ The Trivia app is a Trivia game where multiple individuals can play a Trivia gam
 
 ## Design
 
-The design is viewable at the following address: https://www.figma.com/file/UEcKqOJsedP0oq60JypDhV/Main-design
+The design is viewable at: https://www.figma.com/file/UEcKqOJsedP0oq60JypDhV/Main-design
 
 ---
 
