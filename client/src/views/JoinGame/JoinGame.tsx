@@ -1,7 +1,8 @@
 import React from 'react';
+import * as S from './JoinGame.style';
 
 function JoinGame() {
-  return <div>JOIN GAME</div>;
+  return <S.Wrapper>JOIN GAME</S.Wrapper>;
 }
 
 export default JoinGame;
