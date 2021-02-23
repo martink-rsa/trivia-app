@@ -2,6 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
+  id: string;
+  name: string;
   label?: string;
   children?: React.ReactNode;
 }
@@ -31,11 +33,11 @@ const BaselineInput = styled.input<StyleProps>`
   padding: 8px 20px;
 `;
 
-function Input({ label, children, ...props }: Props) {
+function Input({ label, id, name, children, ...props }: Props) {
   return (
     <Wrapper>
-      <Label>{label}</Label>
-      <BaselineInput {...props}></BaselineInput>
+      <Label htmlFor={id}>{label}</Label>
+      <BaselineInput id={id} name={name} {...props}></BaselineInput>
     </Wrapper>
   );
 }
