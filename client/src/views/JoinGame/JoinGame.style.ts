@@ -8,11 +8,20 @@ export const Wrapper = styled.div`
   height: 100%;
   width: 100%;
   background-color: ${({ theme }) => theme.color.primary};
-  padding: 10px 20px;
+  padding: 50px 20px 10px 20px;
+
+  img {
+    max-width: 100%;
+    width: 176px;
+    margin-bottom: 50px;
+  }
 
   form {
     padding: 0;
     margin: 0;
     width: 100%;
+    button {
+      margin-top: 20px;
+    }
   }
 `;
