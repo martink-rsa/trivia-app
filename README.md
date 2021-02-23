@@ -10,6 +10,10 @@ The Trivia app is a Trivia game where multiple individuals can play a Trivia gam
 
 The design is viewable at: https://www.figma.com/file/UEcKqOJsedP0oq60JypDhV/Main-design
 
+## Tasks
+
+Tasks are available at: https://trello.com/b/EEXohng4/trivia-app
+
 ---
 
 ## Client
