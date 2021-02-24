@@ -41,3 +41,13 @@ The server uses Node.js and socket.io
 ### Install
 
 `yarn`
+
+### To run:
+
+Start a local db: `yarn startdb` (Do not close this window)
+
+Start the dev server: `yarn dev` (Do not close this window)
+
+### Tests
+
+`yarn test`
