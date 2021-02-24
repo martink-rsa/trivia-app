@@ -4,6 +4,8 @@ const express = require('express');
 
 const index = require('./routes/index');
 
+require('./db/mongoose');
+
 const app = express();
 app.use(express.json());
 
@@ -15,13 +17,7 @@ const io = socketIo(server, {
   },
 });
 
-const port = process.env.PORT || 3001;
-
 app.use(index);
-
-server.listen(port, () => {
-  console.log('Server started on port', port);
-});
 
 io.on('connection', (socket) => {
   console.log('Server: User connected');
@@ -38,3 +34,5 @@ io.on('connection', (socket) => {
     console.log('Server: User disconnected');
   });
 });
+
+module.exports = app;
