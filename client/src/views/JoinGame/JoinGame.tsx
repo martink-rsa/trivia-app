@@ -12,10 +12,10 @@ function JoinGame(props: Props) {
   const { handleJoin } = props;
 
   /** The name of the player */
-  const [playerName, setPlayerName] = useState('');
+  const [playerName, setPlayerName] = useState('John');
 
   /** The room the player will join */
-  const [room, setRoom] = useState('');
+  const [room, setRoom] = useState('ABCDE');
 
   /**
    * Validates and sets the players name from an HTML input.
@@ -26,6 +26,9 @@ function JoinGame(props: Props) {
     if (value.match(/^[A-Za-z0-9]+$/)) {
       setPlayerName(value);
     }
+    if (value === '') {
+      setPlayerName('');
+    }
   };
 
   /**
@@ -35,7 +38,6 @@ function JoinGame(props: Props) {
   const changeRoom = (event: React.FormEvent<HTMLInputElement>): void => {
     const { value } = event.currentTarget as HTMLInputElement;
     const _value = value.toUpperCase();
-    console.log(_value);
     if (_value.match(/^[A-Za-z0-9]+$/)) {
       setRoom(_value);
     }

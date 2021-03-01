@@ -13,21 +13,21 @@ const roomOne = {
   topic: 'Programming',
 };
 const userOne = {
-  _id: userOneId,
+  // _id: userOneId,
   username: 'John',
   iconId: 0,
   color: 'red',
 };
 const userTwo = {
-  _id: userTwoId,
-  username: 'Adam',
-  iconId: 0,
+  // _id: userTwoId,
+  username: 'Adam123',
+  iconId: 1,
   color: 'green',
 };
 const userThree = {
-  _id: userThreeId,
+  // _id: userThreeId,
   username: 'Paul',
-  iconId: 0,
+  iconId: 2,
   color: 'blue',
 };
 

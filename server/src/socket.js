@@ -1,18 +1,8 @@
-const app = require('./app');
-const http = require('http');
+const { server } = require('./index');
+
 const socketIo = require('socket.io');
 
-const port = process.env.PORT;
-
-const server = http.createServer(app).listen(port, function () {
-  console.log('Express server listening on port ' + port);
-});
-
-const io = socketIo(server, {
-  cors: {
-    origin: 'http://localhost:3000',
-  },
-});
+const io = socketIo.listen(server);
 
 io.on('connection', (socket) => {
   console.log('Server: User connected');

@@ -5,12 +5,12 @@ const user0 = {
 };
 const user1 = {
   username: 'PERSON 1',
-  iconId: 0,
+  iconId: 1,
   color: 'red',
 };
 const user2 = {
   username: 'PERSON 2',
-  iconId: 0,
+  iconId: 2,
   color: 'green',
 };
 

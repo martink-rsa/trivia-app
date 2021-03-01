@@ -1,11 +1,17 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
 
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
-    required: true,
-    trim: true,
+    required: [true, 'Enter  a username'],
+    trim: [true, 'That username is taken'],
     unique: true,
+    validate(value) {
+      if (!validator.isAlphanumeric(value)) {
+        throw new Error('Username can only contain letters and numbers');
+      }
+    },
   },
   iconId: {
     type: Number,
