@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 // const User = require('./user');
 
 const roomSchema = new mongoose.Schema({
@@ -12,7 +12,7 @@ const roomSchema = new mongoose.Schema({
   admin: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "User",
+    ref: 'User',
   },
   users: {
     type: Array,
@@ -22,8 +22,14 @@ const roomSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+  // Game logic
+  currentState: {
+    type: String,
+    required: true,
+    trim: true,
+  },
 });
 
-const Room = mongoose.model("Room", roomSchema);
+const Room = mongoose.model('Room', roomSchema);
 
 module.exports = Room;

@@ -17,7 +17,7 @@ router.post('/', async (req, res, next) => {
     }
     const user = { username, room, iconId: 0, color: 'red' };
     await addUser(user);
-    /* Success at this point, add user to server */
+    // Success at this point, add user to server.
     res.status(200).send({ message: 'User has joined' });
   } catch (error) {
     next(error);
