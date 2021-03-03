@@ -2,6 +2,8 @@ const app = require('./app');
 const http = require('http');
 const socketIo = require('socket.io');
 const validator = require('validator');
+const User = require('./models/user');
+const chalk = require('chalk');
 
 const port = process.env.PORT;
 
@@ -32,7 +34,7 @@ io.on('connection', (socket) => {
   });
 
   // When a user attempts to join the game
-  socket.on('attemptJoin', ({ username = '', room = '' }, callback) => {
+  socket.on('attemptJoin', async ({ username = '', room = '' }, callback) => {
     // Steps:
     // 1. User clicks join
     // 2. Check that the username is valid
@@ -46,14 +48,14 @@ io.on('connection', (socket) => {
     if (!username) {
       return callback({
         error: 'syntaxError',
-        message: 'No username has been provided',
+        info: 'No username has been provided',
         field: 'username',
       });
     }
     if (usernameNotValid) {
       return callback({
         error: 'syntaxError',
-        message: 'Username is invalid',
+        info: 'Username is invalid',
         field: 'username',
       });
     }
@@ -63,20 +65,42 @@ io.on('connection', (socket) => {
     if (!room) {
       return callback({
         error: 'syntaxError',
-        message: 'No room has been provided',
+        info: 'No room has been provided',
         field: 'room',
       });
     }
     if (roomNotValid) {
       return callback({
         error: 'syntaxError',
-        message: 'Room name is invalid',
+        info: 'Room name is invalid',
         field: 'room',
       });
     }
 
-    console.log('ATTEMPTING TO JOIN');
-    console.log(username, room);
+    // Adding the user
+    try {
+      const newUser = new User({ username, room, iconId: 0, color: 'red' });
+      await newUser.save();
+    } catch (error) {
+      if (error.code && error.code === 11000) {
+        return callback({
+          error: 'usernameTaken',
+          info: 'Username is taken',
+          field: 'username',
+        });
+      } else {
+        return callback({
+          error: 'unknownError',
+          info: 'Unknown error',
+          field: 'username',
+        });
+      }
+    }
+
+    console.log(
+      chalk.green.inverse.bold(' SUCCESS '),
+      `User Added: ${username} to ${room}`,
+    );
   });
 
   /** User has disconnected from websocket */

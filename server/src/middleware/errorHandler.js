@@ -4,6 +4,7 @@ module.exports = (error, req, res, next) => {
     // Mongoose duplication error
     if (error.code && error.code === 11000) {
       const field = Object.keys(error.keyValue);
+      console.log('ERROR HANDLER:', '11000');
       return res
         .status(409)
         .send({ message: 'A duplicate field exists', field });

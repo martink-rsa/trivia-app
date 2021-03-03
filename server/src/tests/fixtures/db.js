@@ -33,10 +33,10 @@ const userThree = {
 
 const setupDatabase = async () => {
   await User.deleteMany(); // Delete all users before tests run
-  await Room.deleteMany(); // Delete all tasks before tests run
+  // await Room.deleteMany(); // Delete all tasks before tests run
 
   // Rooms
-  await new Room(roomOne).save();
+  // await new Room(roomOne).save();
 
   // Users
   await new User(userOne).save();
