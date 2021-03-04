@@ -17,18 +17,21 @@ const userOne = {
   username: 'John',
   iconId: 0,
   color: 'red',
+  socketId: 'abc',
 };
 const userTwo = {
   // _id: userTwoId,
   username: 'Adam123',
   iconId: 1,
   color: 'green',
+  socketId: 'def',
 };
 const userThree = {
   // _id: userThreeId,
   username: 'Paul',
   iconId: 2,
   color: 'blue',
+  socketId: 'xyz',
 };
 
 const setupDatabase = async () => {

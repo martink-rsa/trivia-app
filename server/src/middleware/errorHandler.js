@@ -1,5 +1,6 @@
 module.exports = (error, req, res, next) => {
   try {
+    console.log('ERROR HANDLER.JS TRIGGER');
     console.log(error);
     // Mongoose duplication error
     if (error.code && error.code === 11000) {

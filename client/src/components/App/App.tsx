@@ -22,6 +22,13 @@ function App() {
     socket.on('userConnected', (data: any) => {
       console.log(data);
     });
+    socket.on('roomMessage', (data: any) => {
+      console.log(data);
+    });
+    socket.on('updateGameState', (data: any) => {
+      console.log('changing game state');
+      setGameState(data);
+    });
   }, []);
 
   function handleJoin(name: string, room: string) {
@@ -32,7 +39,12 @@ function App() {
   const attemptJoin = async (username: string, room: string) => {
     console.log(username);
     console.log(room);
-    const res = await axios.post('http://localhost:3001/', {
+    socket.emit('attemptJoin', { username, room }, (message: any) => {
+      console.log('CALLBACK');
+      console.log(message);
+    });
+
+    /* const res = await axios.post('http://localhost:3001/', {
       username,
       room,
     });
@@ -40,7 +52,7 @@ function App() {
     if (res.status === 200) {
       // setupServerConnection();
       // setGameState(GameStates.LOBBY);
-    }
+    } */
   };
 
   /* const setupServerConnection = () => {

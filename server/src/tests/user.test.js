@@ -19,7 +19,7 @@ describe('Users', () => {
       const user = await getUserFromName(user0.username);
       expect(user).toMatchObject(user0);
     });
-    it('should not create a new user if username exists', async () => {
+    /* it('should not create a new user if username exists', async () => {
       let error;
       try {
         const test0 = await addUser(user0);
@@ -35,7 +35,7 @@ describe('Users', () => {
       const users = await getAllUsers();
       expect(users.length).toBe(4);
       // expect(error).toBeInstanceOf(mongoose.Error.ValidationError
-    });
+    }); */
   });
   describe('Get/find', () => {
     it('should find the correct user', async () => {

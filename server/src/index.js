@@ -2,8 +2,11 @@ const app = require('./app');
 const http = require('http');
 const socketIo = require('socket.io');
 const validator = require('validator');
-const User = require('./models/user');
 const chalk = require('chalk');
+const log = require('./utils/log');
+
+const User = require('./models/user');
+const Room = require('./models/room');
 
 const port = process.env.PORT;
 
@@ -78,9 +81,16 @@ io.on('connection', (socket) => {
     }
 
     // Adding the user
+    let newUser;
     try {
-      const newUser = new User({ username, room, iconId: 0, color: 'red' });
-      await newUser.save();
+      const user = new User({
+        username,
+        room,
+        iconId: 0,
+        color: 'red',
+        socketId: socket.id,
+      });
+      newUser = await user.save();
     } catch (error) {
       if (error.code && error.code === 11000) {
         return callback({
@@ -97,15 +107,89 @@ io.on('connection', (socket) => {
       }
     }
 
-    console.log(
-      chalk.green.inverse.bold(' SUCCESS '),
-      `User Added: ${username} to ${room}`,
+    // Logging user
+    log('====================================');
+    log.success(`User Added: ${newUser.username}`);
+    log('------------------------------------');
+    Object.keys(newUser._doc).forEach((field) =>
+      log(`◦ ${field}: ${newUser._doc[field]}`),
     );
+    log('====================================');
+
+    // Joining a room
+    // 1. Check room exists
+    // 1.1 If room exists, add user to room
+    // 1.2 If room doesn't exist, create room with user as admin
+    let foundRoom;
+    try {
+      foundRoom = await Room.findOne({ name: room });
+    } catch (error) {
+      console.log(error);
+    }
+
+    let savedRoom;
+    if (foundRoom) {
+      // Joining an existing room
+      log.info('Room exists');
+      if (!foundRoom.users.includes(newUser._id)) {
+        foundRoom.users.push(newUser._id);
+        await foundRoom.save();
+        log.info('User added to existing MongoDB room');
+      } else {
+        log.error('User is already added to room');
+        return callback({
+          error: 'serverError',
+          info: 'User is already added to the room',
+          field: '',
+        });
+      }
+    } else {
+      // Creating a new room
+      log.info('Room does not exist');
+      const newRoom = Room({
+        name: room,
+        admin: newUser._id,
+        users: [newUser._id],
+        topic: 'Programming',
+      });
+      savedRoom = await newRoom.save();
+      log.info('User created room');
+    }
+
+    // Socket.io add user to room
+    try {
+      socket.join(room);
+      io.to(room).emit('roomMessage', 'Hello user, welcome to the room');
+      log.info('User added to socket.io room');
+    } catch (error) {
+      return callback({
+        error: 'unknownError',
+        info: 'Unknown error when adding user to Socket.io room',
+        field: '',
+      });
+    }
+
+    // Updating game state for user
+    socket.emit('updateGameState', 'LOBBY');
   });
 
   /** User has disconnected from websocket */
-  socket.on('disconnect', () => {
-    console.log('Server: User disconnected');
+  socket.on('disconnect', async () => {
+    console.log('Server: User disconnected. ID:', socket.id);
+
+    // This will delete a user, but it is not currently the correct
+    //  step to take because a user might not have joined the room yet
+    // It needs to be called in something like a 'leaveRoom' event
+    /* try {
+      await User.findOneAndDelete({ socketId: socket.id });
+      console.log(
+        chalk.green.inverse.bold(' SUCCESS '),
+        `User deleted: ${socket.id}`,
+      );
+    } catch (error) {
+      console.log(error);
+      console.log('ERROR DELETING USER?');
+    } */
   });
 });
 

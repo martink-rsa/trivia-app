@@ -5,13 +5,10 @@ const addUser = async (user) => {
   const message = await newUser
     .save()
     .then(() => {
-      console.log('THEN');
-      return 'HUH';
+      return 'Added';
     })
     .catch((error) => {
-      console.log('ERROR');
-      console.log(error.code);
-      return 'YEAH';
+      return 'Failed';
     });
   return message;
 };
