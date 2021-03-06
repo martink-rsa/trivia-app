@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from "react";
-import * as S from "./PlayerDisplay.style";
-import Player from "../../shared/Player";
+import React, { useState, useEffect } from 'react';
+import * as S from './PlayerDisplay.style';
+import Player from '../../shared/Player';
 
 type Props = {
   player: Player;
 };
 
-function PlayerDisplay({ player }: Props) {
+function PlayerDisplay({
+  player: { username, color, iconId, isAdmin },
+}: Props) {
   return (
     <S.Wrapper>
-      <S.IconContainer>MK</S.IconContainer>
-      <S.Name>{player.username}</S.Name>
+      <S.IconContainer playerColor={color}>MK</S.IconContainer>
+      <S.Name>{username}</S.Name>
     </S.Wrapper>
   );
 }

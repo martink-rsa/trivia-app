@@ -1,16 +1,20 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 const ICON_SIZE = 70;
 
 export const Wrapper = styled.li``;
 
-export const IconContainer = styled.div`
+type IconContainerProps = {
+  playerColor: string;
+};
+
+export const IconContainer = styled.div<IconContainerProps>`
   display: flex;
   justify-content: center;
   align-items: center;
   width: ${ICON_SIZE}px;
   height: ${ICON_SIZE}px;
-  background: blue;
+  background: ${(props) => props.playerColor};
   border-radius: 50%;
 `;
 

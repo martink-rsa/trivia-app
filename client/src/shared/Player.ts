@@ -1,7 +1,7 @@
 type Player = {
-  username: String;
+  username: string;
   iconId: Number;
-  color: String;
+  color: string;
   isAdmin: Boolean;
 };
 
