@@ -1,84 +1,54 @@
 import React, { useState, useEffect } from 'react';
-import * as S from './JoinGame.style';
+import * as S from './Lobby.style';
 import Button from '../../components/Button/Button';
-import Input from '../../components/Input/Input';
-import Logo from '../../assets/images/logo-white.png';
+import PlayerDisplay from '../../components/PlayerDisplay/PlayerDisplay';
+import Player from '../../shared/Player';
 
 type Props = {
-  handleJoin: (name: string, room: string) => void;
+  players: Player[];
 };
 
-function JoinGame(props: Props) {
-  const { handleJoin } = props;
-
-  /** The name of the player */
-  const [playerName, setPlayerName] = useState('John');
-
-  /** The room the player will join */
-  const [room, setRoom] = useState('ABCDE');
-
-  /**
-   * Validates and sets the players name from an HTML input.
-   * @param event The Input element event
-   */
-  const changePlayerName = (event: React.FormEvent<HTMLInputElement>): void => {
-    const { value } = event.currentTarget as HTMLInputElement;
-    /* if (value.match(/^[A-Za-z0-9]+$/)) {
-      setPlayerName(value);
-    }
-    if (value === '') {
-      setPlayerName('');
-    } */
-    setPlayerName(value);
-  };
-
-  /**
-   * Validates and sets the room to play in from an HTML input.
-   * @param event The Input element event
-   */
-  const changeRoom = (event: React.FormEvent<HTMLInputElement>): void => {
-    const { value } = event.currentTarget as HTMLInputElement;
-    const _value = value.toUpperCase();
-    if (_value.match(/^[A-Za-z0-9]+$/)) {
-      setRoom(_value);
-    }
-  };
-
+/** The Lobby screen that shows all the players and leads
+ * to the main game
+ */
+function Lobby({ players }: Props) {
   /**
    * Submits the user's details
    * @param event The Form event
    */
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
-    event.preventDefault();
-    handleJoin(playerName, room);
+    //
   };
 
   return (
     <S.Wrapper>
-      <img src={Logo} alt="Trivia App Logo" />
+      <S.MainContainer>
+        <S.PlayersList>
+          {players.map((player) => (
+            <PlayerDisplay player={player} />
+          ))}
+        </S.PlayersList>
+      </S.MainContainer>
       <form onSubmit={handleSubmit}>
-        <Input
-          label="Name"
-          name="name"
-          id="name"
-          required
-          onChange={changePlayerName}
-          value={playerName}
-        />
-        <Input
-          label="Room"
-          name="room"
-          id="room"
-          required
-          onChange={changeRoom}
-          value={room}
-        />
-        <Button type="submit" invert fullWidth>
-          JOIN
+        <div>
+          <label htmlFor="numQuestions">Questions:</label>
+          <S.Input
+            type="number"
+            id="numQuestions"
+            min="1"
+            max="99"
+            value="20"
+          />
+        </div>
+        <S.Select>
+          <option>Test</option>
+        </S.Select>
+        <Button type="submit" fullWidth>
+          START
         </Button>
       </form>
     </S.Wrapper>
   );
 }
 
-export default JoinGame;
+export default Lobby;
