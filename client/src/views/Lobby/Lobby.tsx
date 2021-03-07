@@ -6,18 +6,20 @@ import Player from '../../shared/Player';
 
 type Props = {
   players: Player[];
+  onSubmit: (numberQuestions: number, subject: string) => void;
 };
-
 /** The Lobby screen that shows all the players and leads
  * to the main game
  */
-function Lobby({ players }: Props) {
+function Lobby({ players, onSubmit }: Props) {
   /**
    * Submits the user's details
    * @param event The Form event
    */
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     //
+    event.preventDefault();
+    onSubmit(20, 'javascript');
   };
 
   return (

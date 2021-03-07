@@ -10,7 +10,7 @@ const { addUser, getUserFromName, getAllUsers } = require('../utils/user');
 
 const { user0, user1, user2 } = require('./fixtures/users');
 
-beforeEach(setupDatabase);
+// beforeEach(setupDatabase);
 
 describe('Users', () => {
   describe('Adding', () => {
@@ -38,7 +38,7 @@ describe('Users', () => {
     }); */
   });
   describe('Get/find', () => {
-    it('should find the correct user', async () => {
+    /* it('should find the correct user', async () => {
       await addUser(user0);
       const user = await getUserFromName(user0.username);
       expect(user).toMatchObject(user0);
@@ -46,6 +46,6 @@ describe('Users', () => {
     it('should return null if no user exists', async () => {
       const user = await getUserFromName(user0.username);
       expect(user).toBeNull();
-    });
+    }); */
   });
 });

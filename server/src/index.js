@@ -171,8 +171,39 @@ io.on('connection', (socket) => {
 
     // Updating game state for user
     socket.emit('updateGameState', 'LOBBY');
+
+    // Get the players in the room
+    const currentRoom = await (
+      await Room.findOne({ name: room }).populate('users')
+    ).execPopulate();
+    console.log(currentRoom.users);
+    const users = currentRoom.users;
+    io.to(room).emit('updatePlayers', users);
+
+    // Get the players in the room
   });
 
+  socket.on('gameStart', async (data) => {
+    // Only want admin to trigger the game starting
+    // Get the correct socketId admin id from the User model
+    // Check if the parameter is the same as the admin id
+    try {
+      const user = await User.findOne({ socketId: socket.id });
+      const room = await Room.findOne({ users: user });
+      console.log('user._id === room.admin:', user._id, room.admin);
+      if (user._id.toString() === room.admin.toString()) {
+        //
+        console.log('IS ADMIN');
+      }
+    } catch (error) {
+      //
+    }
+    console.log('Trigger game start');
+  });
+
+  socket.on('testMessage', async () => {
+    console.log('Server: Test message received');
+  });
   /** User has disconnected from websocket */
   socket.on('disconnect', async () => {
     console.log('Server: User disconnected. ID:', socket.id);

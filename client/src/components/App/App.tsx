@@ -11,12 +11,12 @@ const SERVER = 'http://localhost:3001';
 let socket: any;
 
 enum GameStates {
-  'INTRO',
-  'LOBBY',
+  'INTRO' = 'INTRO',
+  'LOBBY' = 'LOBBY',
 }
 
 function App() {
-  const [gameState, setGameState] = useState<GameStates>(GameStates.LOBBY);
+  const [gameState, setGameState] = useState<GameStates>(GameStates.INTRO);
 
   const [players, setPlayers] = useState<Player[]>([
     { username: 'MICHAEL', iconId: 0, color: 'blue', isAdmin: false },
@@ -24,6 +24,11 @@ function App() {
     { username: 'PAM', iconId: 2, color: 'purple', isAdmin: true },
     { username: 'DWIGHT', iconId: 3, color: 'red', isAdmin: false },
   ]);
+
+  const handleGameState = (data: any) => {
+    console.log('handleGameState');
+    setGameState(data);
+  };
 
   useEffect(() => {
     //
@@ -34,19 +39,34 @@ function App() {
     socket.on('roomMessage', (data: any) => {
       console.log(data);
     });
-    socket.on('updateGameState', (data: any) => {
-      console.log('changing game state');
-      setGameState(data);
+    socket.on('updateGameState', (data: GameStates) => {
+      handleGameState(data);
+    });
+    socket.on('updatePlayers', (data: any) => {
+      console.log('UPDATING PLAYERS');
+      setPlayers(data);
     });
   }, []);
 
-  const getGameScreen = () => {
+  /* const getGameScreen = () => {
     if (gameState === GameStates.INTRO) {
       return <JoinGame handleJoin={attemptJoin} />;
     } else if (gameState === GameStates.LOBBY) {
       return <Lobby players={players} />;
+    } else {
+      return <JoinGame handleJoin={attemptJoin} />;
     }
+  }; */
+
+  const triggerGameStart = (numberQuestions: number, subject: string) => {
+    console.log('Trigger gameStart');
+    socket.emit('gameStart', { numberQuestions, subject });
   };
+
+  useEffect(() => {
+    //
+    console.log('GAMESTATE CHANGED');
+  }, [gameState]);
 
   const attemptJoin = async (username: string, room: string) => {
     console.log(username);
@@ -73,8 +93,13 @@ function App() {
       console.log(data);
     });
   }; */
-
-  return <>{getGameScreen()}</>;
+  if (gameState === GameStates.INTRO) {
+    return <JoinGame handleJoin={attemptJoin} />;
+  } else if (gameState === GameStates.LOBBY) {
+    return <Lobby players={players} onSubmit={triggerGameStart} />;
+  } else {
+    return <div>else returned</div>;
+  }
 }
 
 export default App;
