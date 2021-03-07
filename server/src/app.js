@@ -1,38 +1,33 @@
 const http = require('http');
-const socketIo = require('socket.io');
 const express = require('express');
+require('./db/mongoose');
 
+/* Routes */
 const index = require('./routes/index');
 
-require('./db/mongoose');
+/* Middleware */
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 app.use(express.json());
 
-const server = http.createServer(app);
+http.createServer(app);
 
-const io = socketIo(server, {
-  cors: {
-    origin: 'http://localhost:3000',
-  },
+app.use(function (req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'GET, POST, OPTIONS, PUT, PATCH, DELETE',
+  );
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-Requested-With,content-type',
+  );
+  next();
 });
 
 app.use(index);
 
-io.on('connection', (socket) => {
-  console.log('Server: User connected');
-  socket.emit('userConnected', 'You have connected');
-
-  /** User is attempting to join the room */
-  socket.on('attemptJoin', ({ name, room }) => {
-    console.log('ATTEMPTING TO JOIN');
-    console.log(name, room);
-  });
-
-  /** User has disconnected from websocket */
-  socket.on('disconnect', () => {
-    console.log('Server: User disconnected');
-  });
-});
+app.use(errorHandler);
 
 module.exports = app;
