@@ -5,6 +5,8 @@ const validator = require('validator');
 const chalk = require('chalk');
 const log = require('./utils/log');
 
+const Error = require('./shared/errors');
+
 const User = require('./models/user');
 const Room = require('./models/room');
 
@@ -21,13 +23,12 @@ const io = socketIo(server, {
 });
 
 function handleConnect(socket) {
-  console.log('HANDLING CONNECT');
   // socket.join(user.room);
   // socket.emit('gameState', 'LOBBY');
 }
 
 io.on('connection', (socket) => {
-  console.log('Server: User connected');
+  console.log('Server: + Connected ID:', socket.id);
   socket.emit('userConnected', 'You have connected');
 
   handleConnect(socket);
@@ -49,35 +50,19 @@ io.on('connection', (socket) => {
     // Username
     const usernameNotValid = !validator.isAlphanumeric(username);
     if (!username) {
-      return callback({
-        error: 'syntaxError',
-        info: 'No username has been provided',
-        field: 'username',
-      });
+      return callback(Error.noUsername);
     }
     if (usernameNotValid) {
-      return callback({
-        error: 'syntaxError',
-        info: 'Username is invalid',
-        field: 'username',
-      });
+      return callback(Error.invalidUsername);
     }
 
     // Room
     const roomNotValid = !validator.isAlphanumeric(room);
     if (!room) {
-      return callback({
-        error: 'syntaxError',
-        info: 'No room has been provided',
-        field: 'room',
-      });
+      return callback(Error.noRoom);
     }
     if (roomNotValid) {
-      return callback({
-        error: 'syntaxError',
-        info: 'Room name is invalid',
-        field: 'room',
-      });
+      return callback(Error.invalidRoom);
     }
 
     // Adding the user
@@ -93,23 +78,15 @@ io.on('connection', (socket) => {
       newUser = await user.save();
     } catch (error) {
       if (error.code && error.code === 11000) {
-        return callback({
-          error: 'usernameTaken',
-          info: 'Username is taken',
-          field: 'username',
-        });
+        return callback(Error.usernameUnavailable);
       } else {
-        return callback({
-          error: 'unknownError',
-          info: 'Unknown error',
-          field: 'username',
-        });
+        return callback(Error.unknownErrorUsername);
       }
     }
 
     // Logging user
     log('====================================');
-    log.success(`User Added: ${newUser.username}`);
+    log.success(`User Added: ${newUser.username} -> ${room}`);
     log('------------------------------------');
     Object.keys(newUser._doc).forEach((field) =>
       log(`◦ ${field}: ${newUser._doc[field]}`),
@@ -176,7 +153,6 @@ io.on('connection', (socket) => {
     const currentRoom = await (
       await Room.findOne({ name: room }).populate('users')
     ).execPopulate();
-    console.log(currentRoom.users);
     const users = currentRoom.users;
     io.to(room).emit('updatePlayers', users);
 
@@ -206,7 +182,8 @@ io.on('connection', (socket) => {
   });
   /** User has disconnected from websocket */
   socket.on('disconnect', async () => {
-    console.log('Server: User disconnected. ID:', socket.id);
+    console.log('Server: - Disconnected ID:', socket.id);
+    const user = await User.deleteOne({ socketId: socket.id });
 
     // This will delete a user, but it is not currently the correct
     //  step to take because a user might not have joined the room yet
@@ -224,4 +201,4 @@ io.on('connection', (socket) => {
   });
 });
 
-module.exports = { io };
+module.exports = { io, server };
