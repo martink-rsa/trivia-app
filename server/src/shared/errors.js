@@ -34,6 +34,11 @@ const Error = {
     info: 'Unknown error',
     field: 'username',
   },
+  incorrectUserStartGame: {
+    error: 'incorrectUserStartGame',
+    info: 'Incorrect user has attempted to start the game',
+    field: '',
+  },
 };
 
 module.exports = Error;
