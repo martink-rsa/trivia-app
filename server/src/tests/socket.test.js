@@ -1,6 +1,5 @@
 const clientIo = require('socket.io-client');
 const { setupDatabase, mockRooms, mockUsers } = require('./fixtures/db');
-// require('../app');
 const Room = require('../models/room');
 const User = require('../models/user');
 const { server } = require('../index');
@@ -15,7 +14,7 @@ let socket;
 const TIMEOUT_DURATION = 350;
 
 beforeEach(async () => {
-  await setupDatabase();
+  setupDatabase();
   socket = clientIo.connect(`http://localhost:3011`, {
     'reconnection delay': 0,
     'reopen delay': 0,
@@ -33,46 +32,31 @@ afterAll(() => {
   server.close();
 });
 
-describe('basic socket.io example', () => {
-  it('should emit a message from client to server', async (done) => {
-    socket.emit('testMessage', 'Message sent to server successfully');
-    // Needed to prevent test timeout
-    setTimeout(() => {
-      done();
-    }, TIMEOUT_DURATION);
-  });
-  it('should handle a MongoDB/Mongoose request with socket.io connected', async (done) => {
-    socket.emit('testMessage', 'Message sent to server successfully');
-    /* const rooms = await Room.find({});
-    expect(rooms.length).toBe(mockRooms.length); */
-    // Needed to prevent test timeout
-    setTimeout(() => {
-      done();
-    }, TIMEOUT_DURATION);
-  });
-});
-
-describe('attemptJoin event', () => {
+xdescribe('attemptJoin event', () => {
   describe('Username', () => {
-    it('should get the correct error when no username is provided', async (done) => {
+    it('should get the correct error when no username is provided', (done) => {
       socket.emit('attemptJoin', {}, (callback) => {
         expect(callback).toMatchObject(Error.noUsername);
       });
+      expect.assertions(1);
+
       // Needed to prevent test timeout
       setTimeout(() => {
         done();
       }, TIMEOUT_DURATION);
     });
-    it('should get the correct error when username is invalid', async (done) => {
+    it('should get the correct error when username is invalid', (done) => {
       socket.emit('attemptJoin', { username: 'USERNAME!@$' }, (callback) => {
         expect(callback).toMatchObject(Error.invalidUsername);
       });
+      expect.assertions(1);
+
       // Needed to prevent test timeout
       setTimeout(() => {
         done();
       }, TIMEOUT_DURATION);
     });
-    it('should get the correct error when username is taken', async (done) => {
+    it('should get the correct error when username is taken', (done) => {
       socket.emit(
         'attemptJoin',
         { username: mockUsers[0].username, room: 'ABCDE' },
@@ -80,6 +64,8 @@ describe('attemptJoin event', () => {
           expect(callback).toMatchObject(Error.usernameUnavailable);
         },
       );
+      expect.assertions(1);
+
       // Needed to prevent test timeout
       setTimeout(() => {
         done();
@@ -87,7 +73,7 @@ describe('attemptJoin event', () => {
     });
   });
   describe('Room', () => {
-    it('should get the correct error when no room is provided', async (done) => {
+    it('should get the correct error when no room is provided', (done) => {
       socket.emit('attemptJoin', { username: 'USERNAME' }, (callback) => {
         expect(callback).toMatchObject(Error.noRoom);
       });
@@ -96,7 +82,7 @@ describe('attemptJoin event', () => {
         done();
       }, TIMEOUT_DURATION);
     });
-    it('should get the correct error when no room is provided', async (done) => {
+    it('should get the correct error when no room is provided', (done) => {
       socket.emit(
         'attemptJoin',
         { username: 'USERNAME', room: 'ROO#M!' },
@@ -104,6 +90,8 @@ describe('attemptJoin event', () => {
           expect(callback).toMatchObject(Error.invalidRoom);
         },
       );
+      expect.assertions(1);
+
       // Needed to prevent test timeout
       setTimeout(() => {
         done();
@@ -111,23 +99,51 @@ describe('attemptJoin event', () => {
     });
   });
   describe('Join success', () => {
-    it('should add a user to a room if correct details are provided', async (done) => {
-      socket.emit(
-        'attemptJoin',
-        { username: 'USERNAME1', room: 'NEWROOM' },
-        (callback) => {
-          expect(callback).toMatchObject(Error.noRoom);
-        },
-      );
+    it('should add a user to a room if correct details are provided', (done) => {
+      socket.emit('attemptJoin', { username: 'USERNAME1', room: 'NEWROOM' });
+      setTimeout(async () => {
+        const room = await Room.findOne({ name: 'NEWROOM' });
+        expect(room).not.toBeNull();
+        expect(room.name).toEqual('NEWROOM');
+        expect.assertions(2);
+        setTimeout(() => {
+          done();
+        }, TIMEOUT_DURATION);
+      }, 500);
+    });
+    it('should add a user to an existing room if room exists', (done) => {
+      socket.emit('attemptJoin', { username: 'USERNAME1', room: 'NEWROOM' });
+      setTimeout(() => {
+        socket.emit('attemptJoin', { username: 'USERNAME2', room: 'NEWROOM' });
+      }, 100);
 
       setTimeout(async () => {
         const room = await Room.findOne({ name: 'NEWROOM' });
         expect(room).not.toBeNull();
         expect(room.name).toEqual('NEWROOM');
+        expect(room.users.length).toBe(2);
+        expect.assertions(3);
         setTimeout(() => {
           done();
         }, TIMEOUT_DURATION);
       }, 500);
+    });
+  });
+});
+
+describe('gameStart event', () => {
+  describe('Validates the user submitting the request', () => {
+    it('should not proceed with game if incorrect user triggers game start event', async (done) => {
+      socket.emit('gameStart', {}, (callback) => {
+        expect(callback).toMatchObject(Error.incorrectUserStartGame);
+      });
+
+      expect.assertions(1);
+
+      // Needed to prevent test timeout
+      setTimeout(() => {
+        done();
+      }, TIMEOUT_DURATION);
     });
   });
 });

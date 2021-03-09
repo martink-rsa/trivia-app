@@ -147,7 +147,7 @@ io.on('connection', (socket) => {
     }
 
     // Updating game state for user
-    socket.emit('updateGameState', 'LOBBY');
+    io.to(room).emit('updateGameState', 'LOBBY');
 
     // Get the players in the room
     const currentRoom = await (
@@ -159,22 +159,42 @@ io.on('connection', (socket) => {
     // Get the players in the room
   });
 
-  socket.on('gameStart', async (data) => {
-    // Only want admin to trigger the game starting
-    // Get the correct socketId admin id from the User model
-    // Check if the parameter is the same as the admin id
+  socket.on('gameStart', async ({}, callback) => {
+    // * Only want admin to trigger the game starting
+    // * Get the correct socketId admin id from the User model
+    // * Check if the parameter is the same as the admin id
+    // Trying to avoid passing in parameters so that people can't
+    //    pass in fake/forged values e.g. they pass in a room that they are
+    //    not part of.
+    // We fetch the user using the socket.io id, then fetch the room based on
+    //    this user.
+    // The fetched room is what is used to emit to, otherwise we'd have to resort
+    //    to a room name being passed as a param
+    log.info('gameStart event');
     try {
+      // Get the user using socket.io id
       const user = await User.findOne({ socketId: socket.id });
+      if (!user) {
+        return callback(Error.incorrectUserStartGame);
+      }
+
+      // Find the room the player is in. This is needed to check the player
+      // is admin, but also later to emit to this room
       const room = await Room.findOne({ users: user });
-      console.log('user._id === room.admin:', user._id, room.admin);
+      if (!room) {
+        return callback(Error.incorrectUserStartGame);
+      }
+
+      // See if player's id matches the admin id
       if (user._id.toString() === room.admin.toString()) {
-        //
-        console.log('IS ADMIN');
+        log.info('Game starting');
+        io.to(room.name).emit('updateGameState', 'GAME');
+      } else {
+        callback(Error.incorrectUserStartGame);
       }
     } catch (error) {
-      //
+      callback(Error.incorrectUserStartGame);
     }
-    console.log('Trigger game start');
   });
 
   socket.on('testMessage', async () => {
