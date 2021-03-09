@@ -40,6 +40,7 @@ function App() {
       console.log(data);
     });
     socket.on('updateGameState', (data: GameStates) => {
+      console.log('New game state:', data);
       handleGameState(data);
     });
     socket.on('updatePlayers', (data: any) => {
@@ -60,7 +61,9 @@ function App() {
 
   const triggerGameStart = (numberQuestions: number, subject: string) => {
     console.log('Trigger gameStart');
-    socket.emit('gameStart', { numberQuestions, subject });
+    socket.emit('gameStart', { numberQuestions, subject }, (callback: any) => {
+      console.log(callback);
+    });
   };
 
   useEffect(() => {
