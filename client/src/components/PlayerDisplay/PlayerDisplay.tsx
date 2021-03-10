@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import * as S from './PlayerDisplay.style';
 import Player from '../../shared/Player';
 

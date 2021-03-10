@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import * as S from './App.style';
+import { useState, useEffect } from 'react';
+import { io } from 'socket.io-client';
+
+// Views
 import JoinGame from '../../views/JoinGame/JoinGame';
 import Lobby from '../../views/Lobby/Lobby';
+import Game from '../../views/Game/Game';
+
 import Player from '../../shared/Player';
-import { io } from 'socket.io-client';
-import axios from 'axios';
 
 const SERVER = 'http://localhost:3001';
 
@@ -13,11 +15,25 @@ let socket: any;
 enum GameStates {
   'INTRO' = 'INTRO',
   'LOBBY' = 'LOBBY',
+  'GAME' = 'GAME',
 }
 
 function App() {
-  const [gameState, setGameState] = useState<GameStates>(GameStates.INTRO);
+  /** The state of the game that determines what view/screen to be showing */
+  const [gameState, setGameState] = useState<GameStates>(GameStates.GAME);
 
+  /** A question that is sent from the backend and is used for the trivia */
+  const [question, setQuestion] = useState({
+    question: { text: 'JIT compiles JavaScript to executable __________' },
+    answers: [
+      { text: 'JavaScript' },
+      { text: 'binary' },
+      { text: 'bytecode' },
+      { text: 'C++' },
+    ],
+  });
+
+  /** Players that are in the room which is used to display a player list */
   const [players, setPlayers] = useState<Player[]>([
     { username: 'MICHAEL', iconId: 0, color: 'blue', isAdmin: false },
     { username: 'JIM', iconId: 1, color: 'green', isAdmin: false },
@@ -25,13 +41,9 @@ function App() {
     { username: 'DWIGHT', iconId: 3, color: 'red', isAdmin: false },
   ]);
 
-  const handleGameState = (data: any) => {
-    console.log('handleGameState');
-    setGameState(data);
-  };
-
   useEffect(() => {
-    //
+    // All socket events are handled here instead of splitting them into each
+    //    component otherwise it is hard to keep track of each of the events
     socket = io(SERVER);
     socket.on('userConnected', (data: any) => {
       console.log(data);
@@ -40,66 +52,70 @@ function App() {
       console.log(data);
     });
     socket.on('updateGameState', (data: GameStates) => {
-      console.log('New game state:', data);
+      console.log(
+        'Server emitted: updateGameState - Updating the state of the game',
+        data,
+      );
       handleGameState(data);
     });
     socket.on('updatePlayers', (data: any) => {
-      console.log('UPDATING PLAYERS');
+      console.log('Server emitted: updatePlayers - Updating player list');
       setPlayers(data);
     });
   }, []);
 
-  /* const getGameScreen = () => {
-    if (gameState === GameStates.INTRO) {
-      return <JoinGame handleJoin={attemptJoin} />;
-    } else if (gameState === GameStates.LOBBY) {
-      return <Lobby players={players} />;
-    } else {
-      return <JoinGame handleJoin={attemptJoin} />;
-    }
-  }; */
-
+  /**
+   * Used to trigger the game from the lobby
+   * @param numberQuestions Number of questions for the trivia
+   * @param subject The subject/scope of the questions e.g. javascript
+   */
   const triggerGameStart = (numberQuestions: number, subject: string) => {
-    console.log('Trigger gameStart');
+    console.log('Client emit: triggerGameStart - Attempt to start the game');
     socket.emit('gameStart', { numberQuestions, subject }, (callback: any) => {
-      console.log(callback);
+      console.log('Callback: gameStart - ', callback);
     });
   };
 
-  useEffect(() => {
-    //
-    console.log('GAMESTATE CHANGED');
-  }, [gameState]);
+  /**
+   * Handles updating the game state, typically when emitted by the server
+   * @param data
+   */
+  const handleGameState = (newGameState: any) => {
+    console.log('handleGameState: Updating game state');
+    setGameState(newGameState);
+  };
 
+  /**
+   * Submits the player's answer to the server for the server to check
+   * if correct
+   * @param index
+   */
+  const submitAnswer = (index: any) => {
+    console.log('Client emit: playerAnswer - Submitting an answer');
+    socket.emit('playerAnswer', { index }, (callback: any) => {
+      //
+    });
+  };
+
+  /**
+   * Attempts to have the player join a room which will only be allowed
+   * if conditions are met e.g. name not taken
+   * @param username
+   * @param room
+   */
   const attemptJoin = async (username: string, room: string) => {
-    console.log(username);
-    console.log(room);
-    socket.emit('attemptJoin', { username, room }, (message: any) => {
-      console.log('CALLBACK');
-      console.log(message);
+    console.log(`Join attempt: ${username} -> ${room}`);
+    socket.emit('attemptJoin', { username, room }, (callback: any) => {
+      console.log('Callback: attemptJoin - ', callback);
     });
-
-    /* const res = await axios.post('http://localhost:3001/', {
-      username,
-      room,
-    });
-    console.log(res);
-    if (res.status === 200) {
-      // setupServerConnection();
-      // setGameState(GameStates.LOBBY);
-    } */
   };
 
-  /* const setupServerConnection = () => {
-    socket = io(SERVER);
-    socket.on('userConnected', (data: any) => {
-      console.log(data);
-    });
-  }; */
   if (gameState === GameStates.INTRO) {
     return <JoinGame handleJoin={attemptJoin} />;
   } else if (gameState === GameStates.LOBBY) {
     return <Lobby players={players} onSubmit={triggerGameStart} />;
+  } else if (gameState === GameStates.GAME) {
+    return <Game question={question} submitAnswer={submitAnswer} />;
   } else {
     return <div>else returned</div>;
   }

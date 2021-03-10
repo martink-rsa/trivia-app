@@ -22,16 +22,25 @@ const io = socketIo(server, {
   },
 });
 
-function handleConnect(socket) {
-  // socket.join(user.room);
-  // socket.emit('gameState', 'LOBBY');
+/* class Game {
+  constructor(socket) {
+    //
+    this.socket = socket;
+  }
+
+  startTimer = () => {
+    this.timer = setTimeout(() => {}, 2000);
+  };
+}
+ */
+function startGame() {
+  console.log('game started');
 }
 
 io.on('connection', (socket) => {
   console.log('Server: + Connected ID:', socket.id);
   socket.emit('userConnected', 'You have connected');
-
-  handleConnect(socket);
+  console.log('Clients connected:', io.engine.clientsCount);
 
   socket.on('serverTest', (message) => {
     console.log(message);
@@ -168,8 +177,8 @@ io.on('connection', (socket) => {
     //    not part of.
     // We fetch the user using the socket.io id, then fetch the room based on
     //    this user.
-    // The fetched room is what is used to emit to, otherwise we'd have to resort
-    //    to a room name being passed as a param
+    // The fetched room is what is used as the emit room target, otherwise we'd
+    //    have to resort to a room name being passed as a param
     log.info('gameStart event');
     try {
       // Get the user using socket.io id
@@ -189,6 +198,7 @@ io.on('connection', (socket) => {
       if (user._id.toString() === room.admin.toString()) {
         log.info('Game starting');
         io.to(room.name).emit('updateGameState', 'GAME');
+        startGame();
       } else {
         callback(Error.incorrectUserStartGame);
       }
@@ -203,7 +213,8 @@ io.on('connection', (socket) => {
   /** User has disconnected from websocket */
   socket.on('disconnect', async () => {
     console.log('Server: - Disconnected ID:', socket.id);
-    const user = await User.deleteOne({ socketId: socket.id });
+    await User.deleteOne({ socketId: socket.id });
+    console.log('Clients connected:', io.engine.clientsCount);
 
     // This will delete a user, but it is not currently the correct
     //  step to take because a user might not have joined the room yet
@@ -218,6 +229,21 @@ io.on('connection', (socket) => {
       console.log(error);
       console.log('ERROR DELETING USER?');
     } */
+  });
+
+  // This adapter will automatically be called with the 'on' events
+  // I found this in the documentation and it could be extremely useful
+  /*
+  https://socket.io/docs/v3/rooms/#Disconnection
+  Starting with socket.io@3.1.0, the underlying Adapter will emit the following events:
+
+    create-room (argument: room)
+    delete-room (argument: room)
+    join-room (argument: room, id)
+    leave-room (argument: room, id)
+  */
+  io.of('/').adapter.on('join-room', (room, id) => {
+    console.log(`socket ${id} has joined room ${room}`);
   });
 });
 
