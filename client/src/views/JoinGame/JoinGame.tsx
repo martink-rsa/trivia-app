@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import * as S from './JoinGame.style';
+
 import Button from '../../components/Button/Button';
 import Input from '../../components/Input/Input';
 import Logo from '../../assets/images/logo-white.png';
