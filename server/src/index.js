@@ -35,6 +35,8 @@ const io = socketIo(server, {
  */
 function startGame() {
   console.log('game started');
+
+  // 1. Get randomized list of questions
 }
 
 io.on('connection', (socket) => {

@@ -20,7 +20,7 @@ enum GameStates {
 
 function App() {
   /** The state of the game that determines what view/screen to be showing */
-  const [gameState, setGameState] = useState<GameStates>(GameStates.GAME);
+  const [gameState, setGameState] = useState<GameStates>(GameStates.INTRO);
 
   /** A question that is sent from the backend and is used for the trivia */
   const [question, setQuestion] = useState({
