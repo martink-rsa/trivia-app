@@ -28,9 +28,14 @@ describe('utils', () => {
 
   describe('getRandomNumbers', () => {
     it('should get 5 random numbers', () => {
-      const numbers = getRandomNumbers(5);
+      const numbers = getRandomNumbers(1, 5, 5);
       expect(numbers.length).toBe(5);
       expect.assertions(1);
+    });
+    it('should throw an error if the range of numbers is less than the numbers needed', () => {
+      expect(() => {
+        getRandomNumbers(1, 5, 6);
+      }).toThrowError();
     });
   });
 
