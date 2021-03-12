@@ -1,22 +1,23 @@
-const app = require('./app');
-const http = require('http');
-const socketIo = require('socket.io');
 const validator = require('validator');
-const chalk = require('chalk');
+const socketIo = require('socket.io');
+const http = require('http');
+// const chalk = require('chalk');
+
+const app = require('./app');
 const log = require('./utils/log');
 
-const Error = require('./shared/errors');
+const Errors = require('./shared/errors');
 
 const User = require('./models/user');
 const Room = require('./models/room');
 
 const port = process.env.PORT;
 
-const server = http.createServer(app).listen(port, function () {
-  console.log('Express server listening on port ' + port);
+const server = http.createServer(app).listen(port, () => {
+  console.log(`Express server listening on port ${port}`);
 });
 
-const io = socketIo(server, {
+const serverIo = socketIo(server, {
   cors: {
     origin: 'http://localhost:3000',
   },
@@ -39,16 +40,17 @@ function startGame() {
   // 1. Get randomized list of questions
 }
 
-io.on('connection', (socket) => {
+serverIo.on('connection', (socket) => {
   console.log('Server: + Connected ID:', socket.id);
   socket.emit('userConnected', 'You have connected');
-  console.log('Clients connected:', io.engine.clientsCount);
+  console.log('Clients connected:', serverIo.engine.clientsCount);
 
   socket.on('serverTest', (message) => {
     console.log(message);
   });
 
   // When a user attempts to join the game
+  // eslint-disable-next-line consistent-return
   socket.on('attemptJoin', async ({ username = '', room = '' }, callback) => {
     // Steps:
     // 1. User clicks join
@@ -61,19 +63,19 @@ io.on('connection', (socket) => {
     // Username
     const usernameNotValid = !validator.isAlphanumeric(username);
     if (!username) {
-      return callback(Error.noUsername);
+      return callback(Errors.noUsername);
     }
     if (usernameNotValid) {
-      return callback(Error.invalidUsername);
+      return callback(Errors.invalidUsername);
     }
 
     // Room
     const roomNotValid = !validator.isAlphanumeric(room);
     if (!room) {
-      return callback(Error.noRoom);
+      return callback(Errors.noRoom);
     }
     if (roomNotValid) {
-      return callback(Error.invalidRoom);
+      return callback(Errors.invalidRoom);
     }
 
     // Adding the user
@@ -89,19 +91,16 @@ io.on('connection', (socket) => {
       newUser = await user.save();
     } catch (error) {
       if (error.code && error.code === 11000) {
-        return callback(Error.usernameUnavailable);
-      } else {
-        return callback(Error.unknownErrorUsername);
+        return callback(Errors.usernameUnavailable);
       }
+      return callback(Errors.unknownErrorUsername);
     }
 
     // Logging user
     log('====================================');
     log.success(`User Added: ${newUser.username} -> ${room}`);
     log('------------------------------------');
-    Object.keys(newUser._doc).forEach((field) =>
-      log(`◦ ${field}: ${newUser._doc[field]}`),
-    );
+    Object.keys(newUser._doc).forEach((field) => log(`◦ ${field}: ${newUser._doc[field]}`));
     log('====================================');
 
     // Joining a room
@@ -147,7 +146,7 @@ io.on('connection', (socket) => {
     // Socket.io add user to room
     try {
       socket.join(room);
-      io.to(room).emit('roomMessage', 'Hello user, welcome to the room');
+      serverIo.to(room).emit('roomMessage', 'Hello user, welcome to the room');
       log.info('User added to socket.io room');
     } catch (error) {
       return callback({
@@ -158,14 +157,12 @@ io.on('connection', (socket) => {
     }
 
     // Updating game state for user
-    io.to(room).emit('updateGameState', 'LOBBY');
+    serverIo.to(room).emit('updateGameState', 'LOBBY');
 
     // Get the players in the room
-    const currentRoom = await (
-      await Room.findOne({ name: room }).populate('users')
-    ).execPopulate();
-    const users = currentRoom.users;
-    io.to(room).emit('updatePlayers', users);
+    const currentRoom = await (await Room.findOne({ name: room }).populate('users')).execPopulate();
+    const { users } = currentRoom;
+    serverIo.to(room).emit('updatePlayers', users);
 
     // Get the players in the room
   });
@@ -186,26 +183,26 @@ io.on('connection', (socket) => {
       // Get the user using socket.io id
       const user = await User.findOne({ socketId: socket.id });
       if (!user) {
-        return callback(Error.incorrectUserStartGame);
+        return callback(Errors.incorrectUserStartGame);
       }
 
       // Find the room the player is in. This is needed to check the player
       // is admin, but also later to emit to this room
       const room = await Room.findOne({ users: user });
       if (!room) {
-        return callback(Error.incorrectUserStartGame);
+        return callback(Errors.incorrectUserStartGame);
       }
 
       // See if player's id matches the admin id
       if (user._id.toString() === room.admin.toString()) {
         log.info('Game starting');
-        io.to(room.name).emit('updateGameState', 'GAME');
+        serverIo.to(room.name).emit('updateGameState', 'GAME');
         startGame();
       } else {
-        callback(Error.incorrectUserStartGame);
+        callback(Errors.incorrectUserStartGame);
       }
     } catch (error) {
-      callback(Error.incorrectUserStartGame);
+      callback(Errors.incorrectUserStartGame);
     }
   });
 
@@ -216,7 +213,7 @@ io.on('connection', (socket) => {
   socket.on('disconnect', async () => {
     console.log('Server: - Disconnected ID:', socket.id);
     await User.deleteOne({ socketId: socket.id });
-    console.log('Clients connected:', io.engine.clientsCount);
+    console.log('Clients connected:', serverIo.engine.clientsCount);
 
     // This will delete a user, but it is not currently the correct
     //  step to take because a user might not have joined the room yet
@@ -244,9 +241,9 @@ io.on('connection', (socket) => {
     join-room (argument: room, id)
     leave-room (argument: room, id)
   */
-  io.of('/').adapter.on('join-room', (room, id) => {
+  serverIo.of('/').adapter.on('join-room', (room, id) => {
     console.log(`socket ${id} has joined room ${room}`);
   });
 });
 
-module.exports = { io, server };
+module.exports = { serverIo, server };
