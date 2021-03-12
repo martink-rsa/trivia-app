@@ -8,7 +8,7 @@ const { topics } = require('../data/data');
  * @param {number} max The maximum value  a number can be
  * @returns {number} A randomized number using the min and max constraints
  * @example
- * generateRandomNumber(1, 5)
+ * generateRandomNumber(1, 5);
  * // returns 3
  */
 const generateRandomNumber = (min: number = 1, max: number = 20) =>
@@ -21,7 +21,7 @@ const generateRandomNumber = (min: number = 1, max: number = 20) =>
  * @param numberArray An array of items to shuffle
  * @returns {array} An array of shuffled items
  * @example:
- * shuffleFisherYates([1, 2, 3, 4, 5])
+ * shuffleFisherYates([1, 2, 3, 4, 5]);
  * // returns [3, 5, 1, 2, 4] (not exact order)
  */
 function shuffleFisherYates(arrayToShuffle: any) {
@@ -41,40 +41,67 @@ function shuffleFisherYates(arrayToShuffle: any) {
   return array;
 }
 
+/**
+ *
+ * @param {number} minimumValue The minimum value constraint for the random number generator
+ * @param {number} maximumValue The maxiumum value constraint for the random number generator
+ * @param {number} numberOfNumbers How many numbers must be generated
+ * @returns {array} An array of random numbers that have been generated
+ * @example:
+ * getRandomNumbers(1, 5, 3);
+ * // [2, 4, 5] (not exact values)
+ */
 const getRandomNumbers = (
   minimumValue: number,
   maximumValue: number,
-  numberOfNumbers: number,
+  totalNumbers: number,
 ) => {
+  // Creating an array of random numbers by shuffling:
+  // 1. Create an array of all numbers in range e.g. min 1, max 5, [1, 2, 3, 4, 5]
+  // 2. Shuffle array e.g. [2, 4, 5, 1, 3]
+  // 3. Return totalNumber number of items from the start of the array
   const range = maximumValue - minimumValue + 1;
-  if (numberOfNumbers > range) {
+  if (totalNumbers > range) {
     throw new Error(
       'The number of questions expected are greater than the range of numbers.',
     );
   }
 
-  const myArr = [0, 1, 2, 3, 4, 5];
-  console.log(shuffleFisherYates(myArr));
+  // Generates an array with numbers in numerical order e.g.
+  // [1, 2, 3, 4, 5] or [3, 4, 5]
+  const arrayOfNumbers = Array.from(
+    { length: range },
+    (_, index: number) => index + minimumValue,
+  );
 
-  // 1. Create an array of all numbers in range e.g. min 1, max 5, [1, 2, 3, 4, 5]
-  // 2. Shuffle array e.g. [2, 4, 5, 1, 3]
-  // 3. Grab the X number of values from the start
+  // Shuffles the generated array
+  const shuffledArray = shuffleFisherYates(arrayOfNumbers);
 
-  /* const numbers = [];
-  for (let i = 0; i < range; i += 1) {
-    //
-
-  } */
+  return shuffledArray.slice(0, totalNumbers);
 };
 
-const getRandomQuestions = (topic: any, numberQuestions: any) => {
+/**
+ * Get an array of questions that will be asked in the Trivia
+ * @param {string} topic The topic for the questions being asked
+ * @param {number} numberQuestions How many questions are being asked
+ * @returns {array} An array containing all of the questions
+ * @example:
+ * getRandomQuestions('javascript', 10)
+ * // returns 10 questions from 'javascript' topic
+ */
+const getRandomQuestions = (topic: string, numberQuestions: number = 20) => {
   if (!{}.hasOwnProperty.call(topics, topic)) {
-    return [];
+    throw new Error('Topic does not exist');
   }
 
-  // console.log(numberQuestions);
-  return [];
-  // const totalQuestions = topics[topic].length;
+  const topicQuestions = topics[topic];
+
+  const totalQuestionsAvailable = topicQuestions.length;
+
+  const randomNumbers = getRandomNumbers(0, totalQuestionsAvailable, numberQuestions);
+
+  const questions = randomNumbers.map((number) => topicQuestions[number]);
+  return questions;
 };
 
 module.exports = { generateRandomNumber, getRandomNumbers, getRandomQuestions };

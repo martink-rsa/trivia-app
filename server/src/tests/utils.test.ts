@@ -27,10 +27,43 @@ describe('utils', () => {
   });
 
   describe('getRandomNumbers', () => {
-    it('should get 5 random numbers', () => {
-      const numbers = getRandomNumbers(1, 5, 5);
+    it('should get 5 random numbers between 1 and 5', () => {
+      const minimum = 1;
+      const maximum = 5;
+      const totalNumbers = 5;
+      const numberArray = [1, 2, 3, 4, 5];
+      const numbers = getRandomNumbers(minimum, maximum, totalNumbers);
+      numbers.forEach((number: number) => {
+        expect(number).toBeGreaterThanOrEqual(minimum);
+        expect(number).toBeLessThanOrEqual(maximum);
+      });
       expect(numbers.length).toBe(5);
-      expect.assertions(1);
+      expect(numbers.sort()).toEqual(numberArray);
+      expect.assertions(totalNumbers * 2 + 2);
+    });
+    it('should get 5 random numbers with a range of 5', () => {
+      const minimum = 10;
+      const maximum = 15;
+      const totalNumbers = 5;
+      const numbers = getRandomNumbers(minimum, maximum, totalNumbers);
+      numbers.forEach((number: number) => {
+        expect(number).toBeGreaterThanOrEqual(minimum);
+        expect(number).toBeLessThanOrEqual(maximum);
+      });
+      expect(numbers.length).toBe(totalNumbers);
+      expect.assertions(totalNumbers * 2 + 1);
+    });
+    it('should get 5 random numbers with a range of 5', () => {
+      const minimum = 10;
+      const maximum = 20;
+      const totalNumbers = 5;
+      const numbers = getRandomNumbers(minimum, maximum, totalNumbers);
+      numbers.forEach((number: number) => {
+        expect(number).toBeGreaterThanOrEqual(minimum);
+        expect(number).toBeLessThanOrEqual(maximum);
+      });
+      expect(numbers.length).toBe(totalNumbers);
+      expect.assertions(totalNumbers * 2 + 1);
     });
     it('should throw an error if the range of numbers is less than the numbers needed', () => {
       expect(() => {
@@ -41,14 +74,17 @@ describe('utils', () => {
 
   describe('getRandomQuestions', () => {
     it('should get a list of 5 random questions for javascript subject', () => {
-      const questions = getRandomQuestions('javascript', 5);
-      expect(questions.length).toBe(5);
-      expect.assertions(1);
+      const totalQuestions = 5;
+      const questions = getRandomQuestions('javascript', totalQuestions);
+      expect(questions.length).toBe(totalQuestions);
+      questions.forEach((question: any) => expect(question).not.toBeNull());
+      expect.assertions(totalQuestions + 1);
     });
 
     it("should get an empty list if topic doesn't exist", () => {
-      const questions = getRandomQuestions('1javascript', 5);
-      expect(questions.length).toBe(0);
+      expect(() => {
+        getRandomQuestions('1javascript', 5);
+      }).toThrowError();
       expect.assertions(1);
     });
   });
