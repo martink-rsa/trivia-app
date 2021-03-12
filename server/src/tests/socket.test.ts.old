@@ -6,7 +6,7 @@ const { server } = require('../index');
 
 const Error = require('../shared/errors');
 
-let socket;
+let socket: any;
 
 // Currently have to add a setTimeout in each of the tests to prevent
 // the socket from disconnecting. This unfortunately adds a delay to
@@ -57,13 +57,9 @@ xdescribe('attemptJoin event', () => {
       }, TIMEOUT_DURATION);
     });
     it('should get the correct error when username is taken', (done) => {
-      socket.emit(
-        'attemptJoin',
-        { username: mockUsers[0].username, room: 'ABCDE' },
-        (callback) => {
-          expect(callback).toMatchObject(Error.usernameUnavailable);
-        },
-      );
+      socket.emit('attemptJoin', { username: mockUsers[0].username, room: 'ABCDE' }, (callback) => {
+        expect(callback).toMatchObject(Error.usernameUnavailable);
+      });
       expect.assertions(1);
 
       // Needed to prevent test timeout
@@ -83,13 +79,9 @@ xdescribe('attemptJoin event', () => {
       }, TIMEOUT_DURATION);
     });
     it('should get the correct error when no room is provided', (done) => {
-      socket.emit(
-        'attemptJoin',
-        { username: 'USERNAME', room: 'ROO#M!' },
-        (callback) => {
-          expect(callback).toMatchObject(Error.invalidRoom);
-        },
-      );
+      socket.emit('attemptJoin', { username: 'USERNAME', room: 'ROO#M!' }, (callback) => {
+        expect(callback).toMatchObject(Error.invalidRoom);
+      });
       expect.assertions(1);
 
       // Needed to prevent test timeout

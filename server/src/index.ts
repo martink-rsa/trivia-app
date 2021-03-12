@@ -40,18 +40,18 @@ function startGame() {
   // 1. Get randomized list of questions
 }
 
-serverIo.on('connection', (socket) => {
+serverIo.on('connection', (socket: any) => {
   console.log('Server: + Connected ID:', socket.id);
   socket.emit('userConnected', 'You have connected');
   console.log('Clients connected:', serverIo.engine.clientsCount);
 
-  socket.on('serverTest', (message) => {
+  socket.on('serverTest', (message: any) => {
     console.log(message);
   });
 
   // When a user attempts to join the game
   // eslint-disable-next-line consistent-return
-  socket.on('attemptJoin', async ({ username = '', room = '' }, callback) => {
+  socket.on('attemptJoin', async ({ username = '', room = '' }, callback: any) => {
     // Steps:
     // 1. User clicks join
     // 2. Check that the username is valid
@@ -79,7 +79,7 @@ serverIo.on('connection', (socket) => {
     }
 
     // Adding the user
-    let newUser;
+    let newUser: any;
     try {
       const user = new User({
         username,
@@ -114,7 +114,7 @@ serverIo.on('connection', (socket) => {
       console.log(error);
     }
 
-    let savedRoom;
+    // let savedRoom;
     if (foundRoom) {
       // Joining an existing room
       log.info('Room exists');
@@ -139,7 +139,8 @@ serverIo.on('connection', (socket) => {
         users: [newUser._id],
         topic: 'Programming',
       });
-      savedRoom = await newRoom.save();
+      await newRoom.save();
+      // savedRoom = await newRoom.save();
       log.info('User created room');
     }
 
@@ -167,7 +168,9 @@ serverIo.on('connection', (socket) => {
     // Get the players in the room
   });
 
-  socket.on('gameStart', async ({}, callback) => {
+  // eslint-disable-next-line no-empty-pattern
+  // eslint-disable-next-line consistent-return
+  socket.on('gameStart', async ({}, callback: any) => {
     // * Only want admin to trigger the game starting
     // * Get the correct socketId admin id from the User model
     // * Check if the parameter is the same as the admin id
@@ -241,7 +244,7 @@ serverIo.on('connection', (socket) => {
     join-room (argument: room, id)
     leave-room (argument: room, id)
   */
-  serverIo.of('/').adapter.on('join-room', (room, id) => {
+  serverIo.of('/').adapter.on('join-room', (room: any, id: any) => {
     console.log(`socket ${id} has joined room ${room}`);
   });
 });

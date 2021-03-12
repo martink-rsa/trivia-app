@@ -3,6 +3,7 @@ module.exports = {
     browser: true,
     commonjs: true,
     es2021: true,
+    jest: true,
   },
   extends: ['airbnb-base'],
   parser: '@typescript-eslint/parser',
@@ -12,5 +13,12 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   rules: {
     'no-underscore-dangle': ['error', { allow: ['_doc', '_id'] }],
+  },
+  settings: {
+    'import/resolver': {
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      },
+    },
   },
 };
