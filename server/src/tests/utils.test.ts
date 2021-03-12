@@ -81,7 +81,7 @@ describe('utils', () => {
       expect.assertions(totalQuestions + 1);
     });
 
-    it("should get an empty list if topic doesn't exist", () => {
+    it("should throw an error if a topic doesn't exist", () => {
       expect(() => {
         getRandomQuestions('1javascript', 5);
       }).toThrowError();

@@ -6,6 +6,8 @@ const http = require('http');
 const app = require('./app');
 const log = require('./utils/log');
 
+const { getRandomQuestions } = require('./utils/utils');
+
 const Errors = require('./shared/errors');
 
 const User = require('./models/user');
@@ -23,20 +25,9 @@ const serverIo = socketIo(server, {
   },
 });
 
-/* class Game {
-  constructor(socket) {
-    //
-    this.socket = socket;
-  }
-
-  startTimer = () => {
-    this.timer = setTimeout(() => {}, 2000);
-  };
-}
- */
-function startGame() {
-  console.log('game started');
-
+function startGame(topic: any, totalQuestions: any) {
+  console.log('game starting:', topic, totalQuestions);
+  // const questions = getRandomQuestions();
   // 1. Get randomized list of questions
 }
 
@@ -100,7 +91,9 @@ serverIo.on('connection', (socket: any) => {
     log('====================================');
     log.success(`User Added: ${newUser.username} -> ${room}`);
     log('------------------------------------');
-    Object.keys(newUser._doc).forEach((field) => log(`◦ ${field}: ${newUser._doc[field]}`));
+    Object.keys(newUser._doc).forEach((field) =>
+      log(`◦ ${field}: ${newUser._doc[field]}`),
+    );
     log('====================================');
 
     // Joining a room
@@ -161,7 +154,9 @@ serverIo.on('connection', (socket: any) => {
     serverIo.to(room).emit('updateGameState', 'LOBBY');
 
     // Get the players in the room
-    const currentRoom = await (await Room.findOne({ name: room }).populate('users')).execPopulate();
+    const currentRoom = await (
+      await Room.findOne({ name: room }).populate('users')
+    ).execPopulate();
     const { users } = currentRoom;
     serverIo.to(room).emit('updatePlayers', users);
 
@@ -200,7 +195,7 @@ serverIo.on('connection', (socket: any) => {
       if (user._id.toString() === room.admin.toString()) {
         log.info('Game starting');
         serverIo.to(room.name).emit('updateGameState', 'GAME');
-        startGame();
+        startGame('javascript', 5);
       } else {
         callback(Errors.incorrectUserStartGame);
       }

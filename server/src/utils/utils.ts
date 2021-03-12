@@ -1,3 +1,5 @@
+export {};
+
 const { topics } = require('../data/data');
 
 /**
@@ -93,13 +95,8 @@ const getRandomQuestions = (topic: string, numberQuestions: number = 20) => {
   if (!{}.hasOwnProperty.call(topics, topic)) {
     throw new Error('Topic does not exist');
   }
-
   const topicQuestions = topics[topic];
-
-  const totalQuestionsAvailable = topicQuestions.length;
-
-  const randomNumbers = getRandomNumbers(0, totalQuestionsAvailable, numberQuestions);
-
+  const randomNumbers = getRandomNumbers(0, topicQuestions.length, numberQuestions);
   const questions = randomNumbers.map((number) => topicQuestions[number]);
   return questions;
 };
