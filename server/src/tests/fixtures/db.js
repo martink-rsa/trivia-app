@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const Room = require('../../models/room');
-const User = require('../../models/user');
+const Room = require('../../models/room.model');
+const User = require('../../models/user.model');
 
 const userOneId = new mongoose.Types.ObjectId();
 

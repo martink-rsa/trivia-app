@@ -1,6 +1,4 @@
-export {};
-
-const { topics } = require('../data/data');
+import { topics } from '../data/data';
 
 /**
  * Generates a random number between the min and max values, with min and max
@@ -13,7 +11,7 @@ const { topics } = require('../data/data');
  * generateRandomNumber(1, 5);
  * // returns 3
  */
-const generateRandomNumber = (min: number = 1, max: number = 20) =>
+const generateRandomNumber = (min = 1, max = 20) =>
   // eslint-disable-next-line implicit-arrow-linebreak
   Math.floor(Math.random() * (max - min + 1) + min);
 
@@ -91,7 +89,7 @@ const getRandomNumbers = (
  * getRandomQuestions('javascript', 10)
  * // returns 10 questions from 'javascript' topic
  */
-const getRandomQuestions = (topic: string, numberQuestions: number = 20) => {
+const getRandomQuestions = (topic: string, numberQuestions = 20) => {
   if (!{}.hasOwnProperty.call(topics, topic)) {
     throw new Error('Topic does not exist');
   }
@@ -101,4 +99,4 @@ const getRandomQuestions = (topic: string, numberQuestions: number = 20) => {
   return questions;
 };
 
-module.exports = { generateRandomNumber, getRandomNumbers, getRandomQuestions };
+export { generateRandomNumber, getRandomNumbers, getRandomQuestions };

@@ -1,7 +1,14 @@
-const mongoose = require('mongoose');
+import * as mongoose from 'mongoose';
 // const User = require('./user');
 
-const roomSchema = new mongoose.Schema({
+export interface IRoom extends mongoose.Document {
+  name: string;
+  admin: mongoose.Schema.Types.ObjectId;
+  users: mongoose.Schema.Types.ObjectId[];
+  topic: string;
+}
+
+const roomSchema: mongoose.Schema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -25,14 +32,8 @@ const roomSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  /* // Game logic
-  currentState: {
-    type: String,
-    required: true,
-    trim: true,
-  }, */
 });
 
-const Room = mongoose.model('Room', roomSchema);
+const Room = mongoose.model<IRoom>('Room', roomSchema);
 
-module.exports = Room;
+export default Room;

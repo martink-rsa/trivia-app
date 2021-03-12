@@ -1,7 +1,14 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
+import * as mongoose from 'mongoose';
+import validator from 'validator';
 
-const userSchema = new mongoose.Schema({
+export interface IUser extends mongoose.Document {
+  username: string;
+  iconId: number;
+  color: string;
+  socketId: string;
+}
+
+const userSchema: mongoose.Schema = new mongoose.Schema({
   username: {
     type: String,
     required: [true, 'Enter  a username'],
@@ -37,6 +44,6 @@ userSchema.virtual('room', {
   foreignField: 'admin',
 });
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model<IUser>('User', userSchema);
 
-module.exports = User;
+export default User;

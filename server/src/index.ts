@@ -1,17 +1,16 @@
-const validator = require('validator');
-const socketIo = require('socket.io');
-const http = require('http');
-// const chalk = require('chalk');
+import { getRandomQuestions } from './utils/utils';
 
-const app = require('./app');
-const log = require('./utils/log');
+import { Server } from 'socket.io';
+import validator from 'validator';
+import * as http from 'http';
 
-const { getRandomQuestions } = require('./utils/utils');
+import app from './app';
+import log from './utils/log';
 
-const Errors = require('./shared/errors');
+import Errors from './shared/errors';
 
-const User = require('./models/user');
-const Room = require('./models/room');
+import User from './models/user.model';
+import Room from './models/room.model';
 
 const port = process.env.PORT;
 
@@ -19,7 +18,13 @@ const server = http.createServer(app).listen(port, () => {
   console.log(`Express server listening on port ${port}`);
 });
 
-const serverIo = socketIo(server, {
+/* const serverIo = socketIo(server, {
+  cors: {
+    origin: 'http://localhost:3000',
+  },
+}); */
+
+const serverIo = new Server(server, {
   cors: {
     origin: 'http://localhost:3000',
   },
@@ -34,7 +39,7 @@ function startGame(topic: any, totalQuestions: any) {
 serverIo.on('connection', (socket: any) => {
   console.log('Server: + Connected ID:', socket.id);
   socket.emit('userConnected', 'You have connected');
-  console.log('Clients connected:', serverIo.engine.clientsCount);
+  // console.log('Clients connected:', serverIo.engine.clientsCount);
 
   socket.on('serverTest', (message: any) => {
     console.log(message);
@@ -102,6 +107,7 @@ serverIo.on('connection', (socket: any) => {
     // 1.2 If room doesn't exist, create room with user as admin
     let foundRoom;
     try {
+      // eslint-disable-next-line semi
       foundRoom = await Room.findOne({ name: room });
     } catch (error) {
       console.log(error);
@@ -126,7 +132,7 @@ serverIo.on('connection', (socket: any) => {
     } else {
       // Creating a new room
       log.info('Room does not exist');
-      const newRoom = Room({
+      const newRoom = new Room({
         name: room,
         admin: newUser._id,
         users: [newUser._id],
@@ -211,7 +217,7 @@ serverIo.on('connection', (socket: any) => {
   socket.on('disconnect', async () => {
     console.log('Server: - Disconnected ID:', socket.id);
     await User.deleteOne({ socketId: socket.id });
-    console.log('Clients connected:', serverIo.engine.clientsCount);
+    // console.log('Clients connected:', serverIo.engine.clientsCount);
 
     // This will delete a user, but it is not currently the correct
     //  step to take because a user might not have joined the room yet

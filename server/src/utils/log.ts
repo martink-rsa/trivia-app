@@ -1,4 +1,4 @@
-const chalk = require('chalk');
+import * as chalk from 'chalk';
 
 const log = (() => {
   const info = (...params) => {
@@ -15,7 +15,7 @@ const log = (() => {
   };
 
   return Object.assign(
-    function () {
+    function (...params) {
       console.log.apply(console, arguments);
     },
     {
@@ -31,4 +31,4 @@ const log = (() => {
   );
 })();
 
-module.exports = log;
+export default log;

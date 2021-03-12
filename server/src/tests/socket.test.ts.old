@@ -1,7 +1,7 @@
 const clientIo = require('socket.io-client');
 const { setupDatabase, mockRooms, mockUsers } = require('./fixtures/db');
-const Room = require('../models/room');
-const User = require('../models/user');
+const Room = require('../models/room.model');
+const User = require('../models/user.model');
 const { server } = require('../index');
 
 const Error = require('../shared/errors');

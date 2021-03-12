@@ -1,4 +1,4 @@
-const Error = {
+const Errors = {
   noUsername: {
     error: 'syntaxError',
     info: 'No username has been provided',
@@ -41,4 +41,4 @@ const Error = {
   },
 };
 
-module.exports = Error;
+export default Errors;

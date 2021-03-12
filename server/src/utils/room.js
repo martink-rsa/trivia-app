@@ -1,4 +1,4 @@
-const Room = require("../models/room");
+const Room = require('../models/room.model');
 
 const createRoom = async (details) => {
   const room = new Room(details);
