@@ -94,7 +94,7 @@ const getRandomQuestions = (topic: string, numberQuestions = 20) => {
     throw new Error('Topic does not exist');
   }
   const topicQuestions = topics[topic];
-  const randomNumbers = getRandomNumbers(0, topicQuestions.length, numberQuestions);
+  const randomNumbers = getRandomNumbers(0, topicQuestions.length - 1, numberQuestions);
   const questions = randomNumbers.map((number) => topicQuestions[number]);
   return questions;
 };

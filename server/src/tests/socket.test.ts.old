@@ -22,8 +22,27 @@ beforeEach(async () => {
     transports: ['websocket'],
   });
 });
+ it('should get the correct error when no room is provided', (done) => {
+      socket.emit('attemptJoin', { username: 'USERNAME' }, (callback) => {
+        expect(callback).toMatchObject(Error.noRoom);
+      });
+      // Needed to prevent test timeout
+      setTimeout(() => {
+        done();
+      }, TIMEOUT_DURATION);
+    });
+    it('should get the correct error when no room is provided', (done) => {
+      socket.emit('attemptJoin', { username: 'USERNAME', room: 'ROO#M!' }, (callback) => {
+        expect(callback).toMatchObject(Error.invalidRoom);
+      });
+      expect.assertions(1);
 
-afterEach((done) => {
+      // Needed to prevent test timeout
+      setTimeout(() => {
+        done();
+      }, TIMEOUT_DURATION);
+    });
+  });
   socket.disconnect();
   done();
 });

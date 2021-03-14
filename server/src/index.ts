@@ -1,6 +1,6 @@
 import { getRandomQuestions } from './utils/utils';
 
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import validator from 'validator';
 import * as http from 'http';
 
@@ -11,6 +11,8 @@ import Errors from './shared/errors';
 
 import User from './models/user.model';
 import Room from './models/room.model';
+
+import Game from './utils/game';
 
 const port = process.env.PORT;
 
@@ -30,19 +32,22 @@ const serverIo = new Server(server, {
   },
 });
 
-function startGame(topic: any, totalQuestions: any) {
-  console.log('game starting:', topic, totalQuestions);
-  // const questions = getRandomQuestions();
-  // 1. Get randomized list of questions
-}
-
-serverIo.on('connection', (socket: any) => {
+serverIo.on('connection', (socket: Socket) => {
   console.log('Server: + Connected ID:', socket.id);
   socket.emit('userConnected', 'You have connected');
   // console.log('Clients connected:', serverIo.engine.clientsCount);
 
+  // const questions = getRandomQuestions('javascript', 5);
+  // const game = new Game('test', questions, 'javascript', 5);
+  // game.startGame();
+
   socket.on('serverTest', (message: any) => {
     console.log(message);
+  });
+
+  socket.on('answerQuestion', async (message: any) => {
+    // const user = await User.findOne({ socketId: socket.id });
+    // const room = await Room.findOne({ users: user });
   });
 
   // When a user attempts to join the game
@@ -123,6 +128,7 @@ serverIo.on('connection', (socket: any) => {
         log.info('User added to existing MongoDB room');
       } else {
         log.error('User is already added to room');
+        // eslint-disable-next-line node/no-callback-literal
         return callback({
           error: 'serverError',
           info: 'User is already added to the room',
@@ -149,6 +155,7 @@ serverIo.on('connection', (socket: any) => {
       serverIo.to(room).emit('roomMessage', 'Hello user, welcome to the room');
       log.info('User added to socket.io room');
     } catch (error) {
+      // eslint-disable-next-line node/no-callback-literal
       return callback({
         error: 'unknownError',
         info: 'Unknown error when adding user to Socket.io room',
@@ -165,13 +172,11 @@ serverIo.on('connection', (socket: any) => {
     ).execPopulate();
     const { users } = currentRoom;
     serverIo.to(room).emit('updatePlayers', users);
-
-    // Get the players in the room
   });
 
   // eslint-disable-next-line no-empty-pattern
   // eslint-disable-next-line consistent-return
-  socket.on('gameStart', async ({}, callback: any) => {
+  socket.on('gameStart', async (_: any, callback: any) => {
     // * Only want admin to trigger the game starting
     // * Get the correct socketId admin id from the User model
     // * Check if the parameter is the same as the admin id
@@ -192,16 +197,26 @@ serverIo.on('connection', (socket: any) => {
 
       // Find the room the player is in. This is needed to check the player
       // is admin, but also later to emit to this room
-      const room = await Room.findOne({ users: user });
+      const room = await Room.findOne({ users: user }).populate('users');
       if (!room) {
         return callback(Errors.incorrectUserStartGame);
       }
 
       // See if player's id matches the admin id
       if (user._id.toString() === room.admin.toString()) {
-        log.info('Game starting');
+        log.info('Game starting', room.name, 'javascript', 5);
+        const questions = getRandomQuestions('javascript', 5);
+
+        const users = [...room.users];
+
+        const game = new Game(room.name, questions, 'javascript', 5, users);
+
+        room.game = game;
+        await room.save();
+
+        room.game.startGame();
+
         serverIo.to(room.name).emit('updateGameState', 'GAME');
-        startGame('javascript', 5);
       } else {
         callback(Errors.incorrectUserStartGame);
       }
@@ -246,8 +261,8 @@ serverIo.on('connection', (socket: any) => {
     leave-room (argument: room, id)
   */
   serverIo.of('/').adapter.on('join-room', (room: any, id: any) => {
-    console.log(`socket ${id} has joined room ${room}`);
+    // console.log(`socket ${id} has joined room ${room}`);
   });
 });
 
-module.exports = { serverIo, server };
+export { serverIo, server };

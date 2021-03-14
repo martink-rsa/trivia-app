@@ -14,7 +14,7 @@ const userSchema: mongoose.Schema = new mongoose.Schema({
     required: [true, 'Enter  a username'],
     trim: [true, 'That username is taken'],
     unique: true,
-    validate(value) {
+    validate(value: string) {
       if (!validator.isAlphanumeric(value)) {
         throw new Error('Username can only contain letters and numbers');
       }

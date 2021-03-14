@@ -73,12 +73,18 @@ describe('utils', () => {
   });
 
   describe('getRandomQuestions', () => {
-    it('should get a list of 5 random questions for javascript subject', () => {
-      const totalQuestions = 5;
-      const questions = getRandomQuestions('javascript', totalQuestions);
-      expect(questions.length).toBe(totalQuestions);
-      questions.forEach((question: any) => expect(question).not.toBeNull());
-      expect.assertions(totalQuestions + 1);
+    it('should get a list of 5 random questions for javascript subject without fault 200 times', () => {
+      const numLoops = 200;
+      for (let i = 0; i < numLoops; i += 1) {
+        const totalQuestions = 5;
+        const questions = getRandomQuestions('javascript', totalQuestions);
+        expect(questions.length).toBe(totalQuestions);
+        questions.forEach((question: any) => {
+          expect(question).not.toBeNull();
+          expect(question).not.toBeUndefined();
+        });
+        expect.assertions(numLoops * (totalQuestions * 2 + 1));
+      }
     });
 
     it("should throw an error if a topic doesn't exist", () => {

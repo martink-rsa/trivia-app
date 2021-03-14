@@ -1,4 +1,5 @@
 import * as mongoose from 'mongoose';
+import Game from '../utils/game';
 // const User = require('./user');
 
 export interface IRoom extends mongoose.Document {
@@ -6,6 +7,7 @@ export interface IRoom extends mongoose.Document {
   admin: mongoose.Schema.Types.ObjectId;
   users: mongoose.Schema.Types.ObjectId[];
   topic: string;
+  game: Game;
 }
 
 const roomSchema: mongoose.Schema = new mongoose.Schema({
@@ -31,6 +33,9 @@ const roomSchema: mongoose.Schema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
+  },
+  game: {
+    type: mongoose.Schema.Types.Mixed,
   },
 });
 
