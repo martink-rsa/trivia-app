@@ -99,4 +99,4 @@ const getRandomQuestions = (topic: string, numberQuestions = 20) => {
   return questions;
 };
 
-export { generateRandomNumber, getRandomNumbers, getRandomQuestions };
+export { generateRandomNumber, getRandomNumbers, getRandomQuestions, shuffleFisherYates };

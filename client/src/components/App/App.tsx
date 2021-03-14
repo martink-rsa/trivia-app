@@ -5,6 +5,8 @@ import { io } from 'socket.io-client';
 import JoinGame from '../../views/JoinGame/JoinGame';
 import Lobby from '../../views/Lobby/Lobby';
 import Game from '../../views/Game/Game';
+import Waiting from '../../views/Waiting/Waiting';
+import Score from '../../views/Score/Score';
 
 import Player from '../../shared/Player';
 
@@ -16,6 +18,8 @@ enum GameStates {
   'INTRO' = 'INTRO',
   'LOBBY' = 'LOBBY',
   'GAME' = 'GAME',
+  'WAITING' = 'WAITING',
+  'SCORE' = 'SCORE',
 }
 
 function App() {
@@ -23,15 +27,7 @@ function App() {
   const [gameState, setGameState] = useState<GameStates>(GameStates.INTRO);
 
   /** A question that is sent from the backend and is used for the trivia */
-  const [question, setQuestion] = useState({
-    question: { text: 'JIT compiles JavaScript to executable __________' },
-    answers: [
-      { text: 'JavaScript' },
-      { text: 'binary' },
-      { text: 'bytecode' },
-      { text: 'C++' },
-    ],
-  });
+  const [question, setQuestion] = useState(null);
 
   /** Players that are in the room which is used to display a player list */
   const [players, setPlayers] = useState<Player[]>([
@@ -40,6 +36,10 @@ function App() {
     { username: 'PAM', iconId: 2, color: 'purple', isAdmin: true },
     { username: 'DWIGHT', iconId: 3, color: 'red', isAdmin: false },
   ]);
+
+  const [playersInProgress, setPlayersInProgress] = useState([]);
+
+  const [score, setScore] = useState([]);
 
   useEffect(() => {
     // All socket events are handled here instead of splitting them into each
@@ -61,6 +61,21 @@ function App() {
     socket.on('updatePlayers', (data: any) => {
       console.log('Server emitted: updatePlayers - Updating player list');
       setPlayers(data);
+    });
+    socket.on('updateQuestion', (data: any) => {
+      console.log(data);
+      setQuestion(data);
+    });
+    socket.on('updatePlayersInProgress', (data: any) => {
+      console.log(data);
+      setPlayersInProgress(data);
+    });
+    socket.on('updateScore', (data: any) => {
+      console.log(data);
+      setScore(data);
+    });
+    socket.on('testMsg', (data: any) => {
+      console.log(data);
     });
   }, []);
 
@@ -116,6 +131,10 @@ function App() {
     return <Lobby players={players} onSubmit={triggerGameStart} />;
   } else if (gameState === GameStates.GAME) {
     return <Game question={question} submitAnswer={submitAnswer} />;
+  } else if (gameState === GameStates.WAITING) {
+    return <Waiting playersInProgress={playersInProgress} />;
+  } else if (gameState === GameStates.SCORE) {
+    return <Score score={score} />;
   } else {
     return <div>else returned</div>;
   }

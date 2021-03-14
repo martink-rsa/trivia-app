@@ -14,6 +14,8 @@ import Room from './models/room.model';
 
 import Game from './utils/game';
 
+const games = {};
+
 const port = process.env.PORT;
 
 const server = http.createServer(app).listen(port, () => {
@@ -212,6 +214,9 @@ serverIo.on('connection', (socket: Socket) => {
         const game = new Game(room.name, questions, 'javascript', 5, users);
 
         room.game = game;
+
+        games[room._id] = game;
+        console.log(games);
         await room.save();
 
         room.game.startGame();
@@ -223,6 +228,13 @@ serverIo.on('connection', (socket: Socket) => {
     } catch (error) {
       callback(Errors.incorrectUserStartGame);
     }
+  });
+
+  socket.on('playerAnswer', async (data: any, callback: any) => {
+    const user = await User.findOne({ socketId: socket.id });
+    const room = await Room.findOne({ users: user });
+    const { index } = data;
+    games[room._id].handleAnswer(parseInt(index), user._id);
   });
 
   socket.on('testMessage', async () => {

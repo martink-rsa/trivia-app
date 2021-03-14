@@ -24,12 +24,16 @@ function Lobby({ players, onSubmit }: Props) {
     onSubmit(20, 'javascript');
   };
 
+  const handleChange = (event: any) => {
+    console.log('Handling change');
+  };
+
   return (
     <S.Wrapper>
       <S.MainContainer>
         <S.PlayersList>
           {players.map((player) => (
-            <PlayerDisplay player={player} />
+            <PlayerDisplay key={player.username} player={player} />
           ))}
         </S.PlayersList>
       </S.MainContainer>
@@ -42,6 +46,7 @@ function Lobby({ players, onSubmit }: Props) {
             min="1"
             max="99"
             value="20"
+            onChange={handleChange}
           />
         </div>
         <S.Select>

@@ -9,14 +9,29 @@ type Props = {
   handleJoin: (name: string, room: string) => void;
 };
 
+const generateRandomNumber = (min = 1, max = 20) =>
+  // eslint-disable-next-line implicit-arrow-linebreak
+  Math.floor(Math.random() * (max - min + 1) + min);
+
+const generateName = () => {
+  // 65 - 90
+  let name = '';
+  const numLetters = generateRandomNumber(15, 20);
+  for (let i = 0; i < numLetters; i += 1) {
+    const letter = generateRandomNumber(65, 90);
+    name += String.fromCharCode(letter);
+  }
+  return name;
+};
+
 function JoinGame(props: Props) {
   const { handleJoin } = props;
 
   /** The name of the player */
-  const [playerName, setPlayerName] = useState('John');
+  const [playerName, setPlayerName] = useState(generateName());
 
   /** The room the player will join */
-  const [room, setRoom] = useState('ABCDE');
+  const [room, setRoom] = useState(generateName());
 
   /**
    * Validates and sets the players name from an HTML input.
