@@ -33,6 +33,11 @@ const StyledButton = styled(BaselineButton)<StyleProps>`
       props.secondary
         ? props.theme.color.secondary
         : props.theme.color.primary};
+  :disabled {
+    color: #c4c4c4;
+    border-color: #c4c4c4;
+    cursor: not-allowed;
+  }
 `;
 
 /** Inverted color for when you want to add a button to a primary color */

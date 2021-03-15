@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
-const Room = require('../../models/room');
-const User = require('../../models/user');
+import * as mongoose from 'mongoose';
+import Room from '../../models/room.model';
+import User from '../../models/user.model';
 
 const userOneId = new mongoose.Types.ObjectId();
 
@@ -49,8 +49,4 @@ const setupDatabase = async () => {
   });
 };
 
-module.exports = {
-  mockRooms,
-  mockUsers,
-  setupDatabase,
-};
+export { mockRooms, mockUsers, setupDatabase };

@@ -1,12 +1,12 @@
 const clientIo = require('socket.io-client');
 const { setupDatabase, mockRooms, mockUsers } = require('./fixtures/db');
-const Room = require('../models/room');
-const User = require('../models/user');
+const Room = require('../models/room.model');
+const User = require('../models/user.model');
 const { server } = require('../index');
 
 const Error = require('../shared/errors');
 
-let socket;
+let socket: any;
 
 // Currently have to add a setTimeout in each of the tests to prevent
 // the socket from disconnecting. This unfortunately adds a delay to
@@ -22,8 +22,27 @@ beforeEach(async () => {
     transports: ['websocket'],
   });
 });
+ it('should get the correct error when no room is provided', (done) => {
+      socket.emit('attemptJoin', { username: 'USERNAME' }, (callback) => {
+        expect(callback).toMatchObject(Error.noRoom);
+      });
+      // Needed to prevent test timeout
+      setTimeout(() => {
+        done();
+      }, TIMEOUT_DURATION);
+    });
+    it('should get the correct error when no room is provided', (done) => {
+      socket.emit('attemptJoin', { username: 'USERNAME', room: 'ROO#M!' }, (callback) => {
+        expect(callback).toMatchObject(Error.invalidRoom);
+      });
+      expect.assertions(1);
 
-afterEach((done) => {
+      // Needed to prevent test timeout
+      setTimeout(() => {
+        done();
+      }, TIMEOUT_DURATION);
+    });
+  });
   socket.disconnect();
   done();
 });
@@ -57,13 +76,9 @@ xdescribe('attemptJoin event', () => {
       }, TIMEOUT_DURATION);
     });
     it('should get the correct error when username is taken', (done) => {
-      socket.emit(
-        'attemptJoin',
-        { username: mockUsers[0].username, room: 'ABCDE' },
-        (callback) => {
-          expect(callback).toMatchObject(Error.usernameUnavailable);
-        },
-      );
+      socket.emit('attemptJoin', { username: mockUsers[0].username, room: 'ABCDE' }, (callback) => {
+        expect(callback).toMatchObject(Error.usernameUnavailable);
+      });
       expect.assertions(1);
 
       // Needed to prevent test timeout
@@ -83,13 +98,9 @@ xdescribe('attemptJoin event', () => {
       }, TIMEOUT_DURATION);
     });
     it('should get the correct error when no room is provided', (done) => {
-      socket.emit(
-        'attemptJoin',
-        { username: 'USERNAME', room: 'ROO#M!' },
-        (callback) => {
-          expect(callback).toMatchObject(Error.invalidRoom);
-        },
-      );
+      socket.emit('attemptJoin', { username: 'USERNAME', room: 'ROO#M!' }, (callback) => {
+        expect(callback).toMatchObject(Error.invalidRoom);
+      });
       expect.assertions(1);
 
       // Needed to prevent test timeout

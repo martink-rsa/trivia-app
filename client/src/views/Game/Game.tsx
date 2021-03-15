@@ -36,28 +36,30 @@ function Game({ question, submitAnswer }: Props) {
    * @param event The Form event
    */
   const onSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
-    //
     event.preventDefault();
     submitAnswer(playerAnswer);
   };
 
   return (
     <S.Wrapper>
-      <S.Question>{question.question.text}</S.Question>
+      <S.Question>
+        {question.questionNumber}: {question?.question?.text}
+      </S.Question>
       <form onSubmit={onSubmit}>
         <S.AnswersContainer>
-          {question.answers.map((answer: { text: string }, index: number) => (
-            <Answer
-              index={index}
-              text={answer.text}
-              isSelected={index.toString() === playerAnswer}
-              setPlayerAnswer={setPlayerAnswer}
-            />
-          ))}
+          {question &&
+            question.answers.map((answer: { text: string }, index: number) => (
+              <Answer
+                index={index}
+                text={answer.text}
+                isSelected={index.toString() === playerAnswer}
+                setPlayerAnswer={setPlayerAnswer}
+              />
+            ))}
         </S.AnswersContainer>
         <S.Timer>00:00</S.Timer>
-        <Button type="submit" fullWidth>
-          START
+        <Button disabled={!playerAnswer} type="submit" fullWidth>
+          GO
         </Button>
       </form>
     </S.Wrapper>

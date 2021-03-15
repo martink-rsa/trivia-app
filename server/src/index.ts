@@ -1,15 +1,20 @@
-const validator = require('validator');
-const socketIo = require('socket.io');
-const http = require('http');
-// const chalk = require('chalk');
+import { getRandomQuestions } from './utils/utils';
 
-const app = require('./app');
-const log = require('./utils/log');
+import { Server, Socket } from 'socket.io';
+import validator from 'validator';
+import * as http from 'http';
 
-const Errors = require('./shared/errors');
+import app from './app';
+import log from './utils/log';
 
-const User = require('./models/user');
-const Room = require('./models/room');
+import Errors from './shared/errors';
+
+import User from './models/user.model';
+import Room from './models/room.model';
+
+import Game from './utils/game';
+
+const games = {};
 
 const port = process.env.PORT;
 
@@ -17,41 +22,39 @@ const server = http.createServer(app).listen(port, () => {
   console.log(`Express server listening on port ${port}`);
 });
 
-const serverIo = socketIo(server, {
+/* const serverIo = socketIo(server, {
+  cors: {
+    origin: 'http://localhost:3000',
+  },
+}); */
+
+const serverIo = new Server(server, {
   cors: {
     origin: 'http://localhost:3000',
   },
 });
 
-/* class Game {
-  constructor(socket) {
-    //
-    this.socket = socket;
-  }
-
-  startTimer = () => {
-    this.timer = setTimeout(() => {}, 2000);
-  };
-}
- */
-function startGame() {
-  console.log('game started');
-
-  // 1. Get randomized list of questions
-}
-
-serverIo.on('connection', (socket) => {
+serverIo.on('connection', (socket: Socket) => {
   console.log('Server: + Connected ID:', socket.id);
   socket.emit('userConnected', 'You have connected');
-  console.log('Clients connected:', serverIo.engine.clientsCount);
+  // console.log('Clients connected:', serverIo.engine.clientsCount);
 
-  socket.on('serverTest', (message) => {
+  // const questions = getRandomQuestions('javascript', 5);
+  // const game = new Game('test', questions, 'javascript', 5);
+  // game.startGame();
+
+  socket.on('serverTest', (message: any) => {
     console.log(message);
+  });
+
+  socket.on('answerQuestion', async (message: any) => {
+    // const user = await User.findOne({ socketId: socket.id });
+    // const room = await Room.findOne({ users: user });
   });
 
   // When a user attempts to join the game
   // eslint-disable-next-line consistent-return
-  socket.on('attemptJoin', async ({ username = '', room = '' }, callback) => {
+  socket.on('attemptJoin', async ({ username = '', room = '' }, callback: any) => {
     // Steps:
     // 1. User clicks join
     // 2. Check that the username is valid
@@ -79,7 +82,7 @@ serverIo.on('connection', (socket) => {
     }
 
     // Adding the user
-    let newUser;
+    let newUser: any;
     try {
       const user = new User({
         username,
@@ -100,7 +103,9 @@ serverIo.on('connection', (socket) => {
     log('====================================');
     log.success(`User Added: ${newUser.username} -> ${room}`);
     log('------------------------------------');
-    Object.keys(newUser._doc).forEach((field) => log(`◦ ${field}: ${newUser._doc[field]}`));
+    Object.keys(newUser._doc).forEach((field) =>
+      log(`◦ ${field}: ${newUser._doc[field]}`),
+    );
     log('====================================');
 
     // Joining a room
@@ -109,12 +114,13 @@ serverIo.on('connection', (socket) => {
     // 1.2 If room doesn't exist, create room with user as admin
     let foundRoom;
     try {
+      // eslint-disable-next-line semi
       foundRoom = await Room.findOne({ name: room });
     } catch (error) {
       console.log(error);
     }
 
-    let savedRoom;
+    // let savedRoom;
     if (foundRoom) {
       // Joining an existing room
       log.info('Room exists');
@@ -124,6 +130,7 @@ serverIo.on('connection', (socket) => {
         log.info('User added to existing MongoDB room');
       } else {
         log.error('User is already added to room');
+        // eslint-disable-next-line node/no-callback-literal
         return callback({
           error: 'serverError',
           info: 'User is already added to the room',
@@ -133,13 +140,14 @@ serverIo.on('connection', (socket) => {
     } else {
       // Creating a new room
       log.info('Room does not exist');
-      const newRoom = Room({
+      const newRoom = new Room({
         name: room,
         admin: newUser._id,
         users: [newUser._id],
         topic: 'Programming',
       });
-      savedRoom = await newRoom.save();
+      await newRoom.save();
+      // savedRoom = await newRoom.save();
       log.info('User created room');
     }
 
@@ -149,6 +157,7 @@ serverIo.on('connection', (socket) => {
       serverIo.to(room).emit('roomMessage', 'Hello user, welcome to the room');
       log.info('User added to socket.io room');
     } catch (error) {
+      // eslint-disable-next-line node/no-callback-literal
       return callback({
         error: 'unknownError',
         info: 'Unknown error when adding user to Socket.io room',
@@ -160,14 +169,16 @@ serverIo.on('connection', (socket) => {
     serverIo.to(room).emit('updateGameState', 'LOBBY');
 
     // Get the players in the room
-    const currentRoom = await (await Room.findOne({ name: room }).populate('users')).execPopulate();
+    const currentRoom = await (
+      await Room.findOne({ name: room }).populate('users')
+    ).execPopulate();
     const { users } = currentRoom;
     serverIo.to(room).emit('updatePlayers', users);
-
-    // Get the players in the room
   });
 
-  socket.on('gameStart', async ({}, callback) => {
+  // eslint-disable-next-line no-empty-pattern
+  // eslint-disable-next-line consistent-return
+  socket.on('gameStart', async (_: any, callback: any) => {
     // * Only want admin to trigger the game starting
     // * Get the correct socketId admin id from the User model
     // * Check if the parameter is the same as the admin id
@@ -188,22 +199,42 @@ serverIo.on('connection', (socket) => {
 
       // Find the room the player is in. This is needed to check the player
       // is admin, but also later to emit to this room
-      const room = await Room.findOne({ users: user });
+      const room = await Room.findOne({ users: user }).populate('users');
       if (!room) {
         return callback(Errors.incorrectUserStartGame);
       }
 
       // See if player's id matches the admin id
       if (user._id.toString() === room.admin.toString()) {
-        log.info('Game starting');
+        log.info('Game starting', room.name, 'javascript', 5);
+        const questions = getRandomQuestions('javascript', 5);
+
+        const users = [...room.users];
+
+        const game = new Game(room.name, questions, 'javascript', 5, users);
+
+        room.game = game;
+
+        games[room._id] = game;
+        console.log(games);
+        await room.save();
+
+        room.game.startGame();
+
         serverIo.to(room.name).emit('updateGameState', 'GAME');
-        startGame();
       } else {
         callback(Errors.incorrectUserStartGame);
       }
     } catch (error) {
       callback(Errors.incorrectUserStartGame);
     }
+  });
+
+  socket.on('playerAnswer', async (data: any, callback: any) => {
+    const user = await User.findOne({ socketId: socket.id });
+    const room = await Room.findOne({ users: user });
+    const { index } = data;
+    games[room._id].handleAnswer(parseInt(index), user._id);
   });
 
   socket.on('testMessage', async () => {
@@ -213,7 +244,7 @@ serverIo.on('connection', (socket) => {
   socket.on('disconnect', async () => {
     console.log('Server: - Disconnected ID:', socket.id);
     await User.deleteOne({ socketId: socket.id });
-    console.log('Clients connected:', serverIo.engine.clientsCount);
+    // console.log('Clients connected:', serverIo.engine.clientsCount);
 
     // This will delete a user, but it is not currently the correct
     //  step to take because a user might not have joined the room yet
@@ -241,9 +272,9 @@ serverIo.on('connection', (socket) => {
     join-room (argument: room, id)
     leave-room (argument: room, id)
   */
-  serverIo.of('/').adapter.on('join-room', (room, id) => {
-    console.log(`socket ${id} has joined room ${room}`);
+  serverIo.of('/').adapter.on('join-room', (room: any, id: any) => {
+    // console.log(`socket ${id} has joined room ${room}`);
   });
 });
 
-module.exports = { serverIo, server };
+export { serverIo, server };
