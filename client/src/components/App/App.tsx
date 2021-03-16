@@ -10,6 +10,8 @@ import Score from '../../views/Score/Score';
 
 import Player from '../../shared/Player';
 
+import { mockPlayersInProgress, mockScore } from '../../mockData/mockData';
+
 const SERVER = 'http://localhost:3001';
 
 let socket: any;
@@ -26,19 +28,16 @@ function App() {
   /** The state of the game that determines what view/screen to be showing */
   const [gameState, setGameState] = useState<GameStates>(GameStates.INTRO);
 
+  /** Players that are in the room which is used to display a player list */
+  const [players, setPlayers] = useState<Player[]>([]);
+
   /** A question that is sent from the backend and is used for the trivia */
   const [question, setQuestion] = useState(null);
 
-  /** Players that are in the room which is used to display a player list */
-  const [players, setPlayers] = useState<Player[]>([
-    { username: 'MICHAEL', iconId: 0, color: 'blue', isAdmin: false },
-    { username: 'JIM', iconId: 1, color: 'green', isAdmin: false },
-    { username: 'PAM', iconId: 2, color: 'purple', isAdmin: true },
-    { username: 'DWIGHT', iconId: 3, color: 'red', isAdmin: false },
-  ]);
-
+  /** Players that are still answering Trivia questions */
   const [playersInProgress, setPlayersInProgress] = useState([]);
 
+  /** End score for all players */
   const [score, setScore] = useState([]);
 
   useEffect(() => {
@@ -126,6 +125,9 @@ function App() {
   };
 
   if (gameState === GameStates.INTRO) {
+    // return <Score scores={mockScore} />;
+    return <Waiting playersInProgress={mockPlayersInProgress} />;
+
     return <JoinGame handleJoin={attemptJoin} />;
   } else if (gameState === GameStates.LOBBY) {
     return <Lobby players={players} onSubmit={triggerGameStart} />;
@@ -134,7 +136,7 @@ function App() {
   } else if (gameState === GameStates.WAITING) {
     return <Waiting playersInProgress={playersInProgress} />;
   } else if (gameState === GameStates.SCORE) {
-    return <Score score={score} />;
+    return <Score scores={score} />;
   } else {
     return <div>else returned</div>;
   }

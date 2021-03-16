@@ -9,6 +9,9 @@ export type ThemeType = {
   colorText: {
     body: string;
   };
+  breakpoints: {
+    xs: number;
+  };
 };
 
 const theme: DefaultTheme = {
@@ -18,6 +21,9 @@ const theme: DefaultTheme = {
   },
   colorText: {
     body: 'var(--color-text-body)',
+  },
+  breakpoints: {
+    xs: 370,
   },
 };
 

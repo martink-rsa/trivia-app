@@ -1,6 +1,6 @@
 type Player = {
   username: string;
-  iconId: Number;
+  iconId: number;
   color: string;
   isAdmin: Boolean;
 };

@@ -27,3 +27,5 @@ export const Wrapper = styled.div`
 export const MainContainer = styled.div`
   flex-grow: 1;
 `;
+
+export const Table = styled.table``;

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import * as S from './JoinGame.style';
 
+import PlayerSelector from '../../components/PlayerSelector/PlayerSelector';
 import Button from '../../components/Button/Button';
 import Input from '../../components/Input/Input';
+
 import Logo from '../../assets/images/logo-white.png';
 
 type Props = {
@@ -89,6 +91,7 @@ function JoinGame(props: Props) {
           onChange={changeRoom}
           value={room}
         />
+        <PlayerSelector />
         <Button type="submit" invert fullWidth>
           JOIN
         </Button>
