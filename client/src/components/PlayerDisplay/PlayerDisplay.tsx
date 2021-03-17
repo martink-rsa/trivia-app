@@ -1,22 +1,21 @@
 import * as S from './PlayerDisplay.style';
 import Player from '../../shared/Player';
-
-import Icons from '../../shared/Icons';
+import Icons from '../PlayerIcons/PlayerIcons';
+import playerColors from '../../shared/playerColors';
 
 type Props = {
   player: Player;
 };
 
+/** Displays a player icon with a name */
 function PlayerDisplay({
-  player: { username, color, iconId, isAdmin },
+  player: { username, colorId, iconId, isAdmin },
 }: Props) {
   return (
-    <S.Wrapper>
-      <S.IconContainer playerColor={color}>
-        <img src={Icons[iconId]} alt={username} />
-      </S.IconContainer>
+    <li>
+      <Icons id={iconId} color={playerColors[colorId]} />
       <S.Name>{username}</S.Name>
-    </S.Wrapper>
+    </li>
   );
 }
 

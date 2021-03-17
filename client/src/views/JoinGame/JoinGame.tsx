@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Dispatch, SetStateAction } from 'react';
 import * as S from './JoinGame.style';
 
 import PlayerSelector from '../../components/PlayerSelector/PlayerSelector';
@@ -8,9 +8,19 @@ import Input from '../../components/Input/Input';
 import Logo from '../../assets/images/logo-white.png';
 
 type Props = {
-  handleJoin: (name: string, room: string) => void;
+  handleJoin: (
+    name: string,
+    room: string,
+    iconId: number,
+    colorId: number,
+  ) => void;
+  iconId: number;
+  setIconId: Dispatch<SetStateAction<number>>;
+  colorId: number;
+  setColorId: Dispatch<SetStateAction<number>>;
 };
 
+// Temporary functions to quickly get random usernames
 const generateRandomNumber = (min = 1, max = 20) =>
   // eslint-disable-next-line implicit-arrow-linebreak
   Math.floor(Math.random() * (max - min + 1) + min);
@@ -26,9 +36,13 @@ const generateName = () => {
   return name;
 };
 
-function JoinGame(props: Props) {
-  const { handleJoin } = props;
-
+function JoinGame({
+  handleJoin,
+  iconId,
+  setIconId,
+  colorId,
+  setColorId,
+}: Props) {
   /** The name of the player */
   const [playerName, setPlayerName] = useState(generateName());
 
@@ -68,7 +82,7 @@ function JoinGame(props: Props) {
    */
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
-    handleJoin(playerName, room);
+    handleJoin(playerName, room, iconId, colorId);
   };
 
   return (
@@ -91,7 +105,12 @@ function JoinGame(props: Props) {
           onChange={changeRoom}
           value={room}
         />
-        <PlayerSelector />
+        <PlayerSelector
+          iconId={iconId}
+          setIconId={setIconId}
+          colorId={colorId}
+          setColorId={setColorId}
+        />
         <Button type="submit" invert fullWidth>
           JOIN
         </Button>
