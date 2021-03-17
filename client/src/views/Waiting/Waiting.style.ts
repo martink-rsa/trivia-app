@@ -27,3 +27,20 @@ export const Wrapper = styled.div`
 export const MainContainer = styled.div`
   flex-grow: 1;
 `;
+
+export const PlayerList = styled.ul`
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 50px 0;
+  margin-top: 50px;
+
+  max-width: 500px;
+  width: 100%;
+
+  @media (max-width: ${(props) => props.theme.breakpoints.xs}px) {
+    grid-template-columns: 1fr;
+  }
+`;

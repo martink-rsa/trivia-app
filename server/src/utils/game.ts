@@ -1,6 +1,14 @@
 import { serverIo } from '../index';
 import { shuffleFisherYates } from '../utils/utils';
 
+type Config = {
+  roomName: string;
+  questions: any[];
+  topic: string;
+  numQuestions: number;
+  players: any[];
+};
+
 type Answer = {
   question: number;
   correctAnswer: null | number;
@@ -26,25 +34,19 @@ class Game {
   timer: null | ReturnType<typeof setInterval> = null;
   players: Player[];
 
-  constructor(
-    roomName: string,
-    questions: any[],
-    topic: string,
-    numQuestions: number,
-    players: any[],
-  ) {
-    this.roomName = roomName;
-    this.questions = questions;
-    this.numQuestions = numQuestions;
-    this.topic = topic;
+  constructor(config: Config) {
+    this.roomName = config.roomName;
+    this.questions = config.questions;
+    this.numQuestions = config.numQuestions;
+    this.topic = config.topic;
     this.questionIndex = 0;
-    this.players = players.map((player) => {
+    this.players = config.players.map((player) => {
       return {
         _id: player._id,
         username: player.username,
         socketId: player.socketId,
         currentQuestion: 0,
-        answers: questions.map((_, index) => ({
+        answers: config.questions.map((_, index) => ({
           question: index,
           correctAnswer: null,
           playersAnswer: null,

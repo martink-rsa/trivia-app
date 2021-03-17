@@ -211,7 +211,15 @@ serverIo.on('connection', (socket: Socket) => {
 
         const users = [...room.users];
 
-        const game = new Game(room.name, questions, 'javascript', 5, users);
+        const config = {
+          roomName: room.name,
+          questions: questions,
+          topic: 'javascript',
+          numQuestions: 5,
+          players: users,
+        };
+
+        const game = new Game(config);
 
         room.game = game;
 

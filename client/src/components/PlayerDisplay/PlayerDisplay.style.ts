@@ -16,8 +16,15 @@ export const IconContainer = styled.div<IconContainerProps>`
   height: ${ICON_SIZE}px;
   background: ${(props) => props.playerColor};
   border-radius: 50%;
+  margin: 0 auto;
+
+  img {
+    height: 70px;
+    width: 60px;
+  }
 `;
 
 export const Name = styled.div`
+  margin-top: 5px;
   text-align: center;
 `;

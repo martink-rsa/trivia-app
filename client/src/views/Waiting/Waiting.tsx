@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
 import * as S from './Waiting.style';
 
+import PlayerDisplay from '../../components/PlayerDisplay/PlayerDisplay';
+
 type Props = {
-  // question: any;
-  // submitAnswer: (index: any) => void;
   playersInProgress: any[];
 };
 
@@ -11,19 +10,15 @@ type Props = {
  * to finish
  */
 function Waiting({ playersInProgress }: Props) {
+  console.log(playersInProgress);
   return (
     <S.Wrapper>
-      Waiting for players to finish.
-      <div>Players:</div>
-      {console.log(playersInProgress)}
-      {playersInProgress.length > 0 && <div>THERE ARE OTHER PLAYERS</div>}
-      <div>
+      <h1>Waiting for players to finish.</h1>
+      <S.PlayerList>
         {playersInProgress.map((player) => (
-          <div>
-            Player: {player.username} {console.log(player)}
-          </div>
+          <PlayerDisplay player={player} />
         ))}
-      </div>
+      </S.PlayerList>
     </S.Wrapper>
   );
 }

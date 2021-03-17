@@ -2,59 +2,60 @@ import React, { useState } from 'react';
 import * as S from './Score.style';
 
 type Props = {
-  score: any[];
+  scores: any[];
 };
-
-const dummyData = [
-  {
-    _id: '604f74c0137e435beafac6d0',
-    username: 'ZOVENFFTZWGWDJFHN',
-    answers: [
-      { question: 0, correctAnswer: 2, playersAnswer: 3 },
-      { question: 1, correctAnswer: 2, playersAnswer: 2 },
-      { question: 2, correctAnswer: 2, playersAnswer: 3 },
-      { question: 3, correctAnswer: 2, playersAnswer: 3 },
-      { question: 4, correctAnswer: 1, playersAnswer: 3 },
-    ],
-  },
-  {
-    _id: '604f74c0137e435beafac6ds',
-    username: 'Bob',
-    answers: [
-      { question: 0, correctAnswer: 2, playersAnswer: 2 },
-      { question: 1, correctAnswer: 2, playersAnswer: 2 },
-      { question: 2, correctAnswer: 2, playersAnswer: 2 },
-      { question: 3, correctAnswer: 2, playersAnswer: 2 },
-      { question: 4, correctAnswer: 1, playersAnswer: 1 },
-    ],
-  },
-];
 
 /** The Score screen that displays at the end of a game and shows
  * all of the player's scores
  */
-function Score({ score }: Props) {
-  console.log(JSON.stringify(score));
-  score = dummyData;
-
-  const parseScores = (scores: any) => {
-    //
-  };
-
-  const getScores = () => {
-    return <div>Test</div>;
-  };
-
-  parseScores(dummyData);
+function Score({ scores }: Props) {
+  /**
+   * Parses a list of players with scores and then calculates their total answers
+   * correct as well as their total score
+   * @param _scores An array of players with their scores
+   */
+  const parseScores = (_scores: any) =>
+    _scores
+      .map((player: any) => {
+        const answersCorrect = player.answers.reduce(
+          (totalAnswersCorrect: number, item: any) => {
+            if (item.playersAnswer === item.correctAnswer) {
+              totalAnswersCorrect += 1;
+            }
+            return totalAnswersCorrect;
+          },
+          0,
+        );
+        player.answersCorrect = answersCorrect;
+        return player;
+      })
+      .sort((a: any, b: any): any => b.answersCorrect - a.answersCorrect);
 
   return (
     <S.Wrapper>
-      Score screen
-      <div>
-        {score.map((player) => (
-          <div>Player{player.username}</div>
-        ))}
-      </div>
+      <h1>Score</h1>
+      <S.Table>
+        <thead>
+          <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>Correct</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          {parseScores(scores).map((player: any, index: any) => (
+            <tr key={player._id}>
+              <td>{index + 1}</td>
+              <td>ICON</td>
+              <td>{player.username}</td>
+              <td>{player.answersCorrect}</td>
+              <td>{Math.floor(Math.random() * 10)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </S.Table>
     </S.Wrapper>
   );
 }
