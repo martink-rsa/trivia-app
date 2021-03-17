@@ -10,6 +10,7 @@ import Score from '../../views/Score/Score';
 
 import Player from '../../shared/Player';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { mockPlayersInProgress, mockScore } from '../../mockData/mockData';
 
 const SERVER = 'http://localhost:3001';
@@ -30,6 +31,12 @@ function App() {
 
   /** Players that are in the room which is used to display a player list */
   const [players, setPlayers] = useState<Player[]>([]);
+
+  /** The index used for the icon the player chose */
+  const [iconId, setIconId] = useState(0);
+
+  /** The color used for the icon the player chose */
+  const [colorId, setColorId] = useState(0);
 
   /** A question that is sent from the backend and is used for the trivia */
   const [question, setQuestion] = useState(null);
@@ -117,18 +124,35 @@ function App() {
    * @param username
    * @param room
    */
-  const attemptJoin = async (username: string, room: string) => {
+  const attemptJoin = async (
+    username: string,
+    room: string,
+    iconId: number,
+    colorId: number,
+  ) => {
     console.log(`Join attempt: ${username} -> ${room}`);
-    socket.emit('attemptJoin', { username, room }, (callback: any) => {
-      console.log('Callback: attemptJoin - ', callback);
-    });
+    socket.emit(
+      'attemptJoin',
+      { username, room, iconId, colorId },
+      (callback: any) => {
+        console.log('Callback: attemptJoin - ', callback);
+      },
+    );
   };
 
   if (gameState === GameStates.INTRO) {
     // return <Score scores={mockScore} />;
-    return <Waiting playersInProgress={mockPlayersInProgress} />;
+    // return <Waiting playersInProgress={mockPlayersInProgress} />;
 
-    return <JoinGame handleJoin={attemptJoin} />;
+    return (
+      <JoinGame
+        handleJoin={attemptJoin}
+        iconId={iconId}
+        setIconId={setIconId}
+        colorId={colorId}
+        setColorId={setColorId}
+      />
+    );
   } else if (gameState === GameStates.LOBBY) {
     return <Lobby players={players} onSubmit={triggerGameStart} />;
   } else if (gameState === GameStates.GAME) {

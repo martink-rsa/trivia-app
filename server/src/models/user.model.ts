@@ -4,7 +4,7 @@ import validator from 'validator';
 export interface IUser extends mongoose.Document {
   username: string;
   iconId: number;
-  color: string;
+  colorID: number;
   socketId: string;
 }
 
@@ -24,8 +24,8 @@ const userSchema: mongoose.Schema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  color: {
-    type: String,
+  colorId: {
+    type: Number,
     required: true,
   },
   socketId: {

@@ -17,19 +17,19 @@ const mockUsers = [
   {
     username: 'MICHAEL',
     iconId: 0,
-    color: 'red',
+    colorId: 0,
     socketId: 'abc',
   },
   {
     username: 'PAM',
     iconId: 1,
-    color: 'green',
+    colorId: 1,
     socketId: 'def',
   },
   {
     username: 'JIM',
     iconId: 2,
-    color: 'blue',
+    colorId: 2,
     socketId: 'xyz',
   },
 ];

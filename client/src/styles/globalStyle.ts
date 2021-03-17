@@ -24,6 +24,20 @@ const GlobalStyle = createGlobalStyle`
   h1, h2, h3, h4, h5, h6 {
     text-align: center;
   }
+
+  button {
+    cursor: pointer;
+  }
+
+  .rotate-cw-90 {
+    transform: rotate(90deg);
+  }
+  .rotate-cw-90 {
+    transform: rotate(180deg);
+  }
+  .rotate-ccw-90 {
+    transform: rotate(-90deg);
+  }
 `;
 
 export default GlobalStyle;

@@ -1,5 +1,4 @@
 import * as S from './Waiting.style';
-
 import PlayerDisplay from '../../components/PlayerDisplay/PlayerDisplay';
 
 type Props = {
@@ -10,10 +9,9 @@ type Props = {
  * to finish
  */
 function Waiting({ playersInProgress }: Props) {
-  console.log(playersInProgress);
   return (
     <S.Wrapper>
-      <h1>Waiting for players to finish.</h1>
+      <h1>Waiting for players to finish...</h1>
       <S.PlayerList>
         {playersInProgress.map((player) => (
           <PlayerDisplay player={player} />
