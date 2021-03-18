@@ -68,7 +68,6 @@ function PlayerIcons({ id, color, size = 70 }: Props) {
     case 8:
       return (
         <S.IconContainer size={size} playerColor={color}>
-          {' '}
           <IconMonkey />
         </S.IconContainer>
       );

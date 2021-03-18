@@ -1,4 +1,7 @@
 import * as S from './Waiting.style';
+
+import ViewWrapper from '../../components/ViewWrapper/ViewWrapper';
+import MainContainer from '../../components/MainContainer/MainContainer';
 import PlayerDisplay from '../../components/PlayerDisplay/PlayerDisplay';
 
 type Props = {
@@ -10,14 +13,16 @@ type Props = {
  */
 function Waiting({ playersInProgress }: Props) {
   return (
-    <S.Wrapper>
-      <h1>Waiting for players to finish...</h1>
-      <S.PlayerList>
-        {playersInProgress.map((player) => (
-          <PlayerDisplay player={player} />
-        ))}
-      </S.PlayerList>
-    </S.Wrapper>
+    <ViewWrapper>
+      <MainContainer>
+        <h1>Waiting for players to finish...</h1>
+        <S.PlayerList>
+          {playersInProgress.map((player) => (
+            <PlayerDisplay player={player} />
+          ))}
+        </S.PlayerList>
+      </MainContainer>
+    </ViewWrapper>
   );
 }
 

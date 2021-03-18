@@ -1,6 +1,7 @@
-import React, { useState, Dispatch, SetStateAction } from 'react';
-import * as S from './JoinGame.style';
+import { useState, FormEvent, Dispatch, SetStateAction } from 'react';
 
+import ViewWrapper from '../../components/ViewWrapper/ViewWrapper';
+import MainContainer from '../../components/MainContainer/MainContainer';
 import PlayerSelector from '../../components/PlayerSelector/PlayerSelector';
 import Button from '../../components/Button/Button';
 import Input from '../../components/Input/Input';
@@ -35,6 +36,7 @@ const generateName = () => {
   }
   return name;
 };
+// ---- End Temporary Functions
 
 function JoinGame({
   handleJoin,
@@ -53,7 +55,7 @@ function JoinGame({
    * Validates and sets the players name from an HTML input.
    * @param event The Input element event
    */
-  const changePlayerName = (event: React.FormEvent<HTMLInputElement>): void => {
+  const changePlayerName = (event: FormEvent<HTMLInputElement>): void => {
     const { value } = event.currentTarget as HTMLInputElement;
     /* if (value.match(/^[A-Za-z0-9]+$/)) {
       setPlayerName(value);
@@ -68,7 +70,7 @@ function JoinGame({
    * Validates and sets the room to play in from an HTML input.
    * @param event The Input element event
    */
-  const changeRoom = (event: React.FormEvent<HTMLInputElement>): void => {
+  const changeRoom = (event: FormEvent<HTMLInputElement>): void => {
     const { value } = event.currentTarget as HTMLInputElement;
     const _value = value.toUpperCase();
     if (_value.match(/^[A-Za-z0-9]+$/)) {
@@ -80,14 +82,16 @@ function JoinGame({
    * Submits the user's details
    * @param event The Form event
    */
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     handleJoin(playerName, room, iconId, colorId);
   };
 
   return (
-    <S.Wrapper>
-      <img src={Logo} alt="Trivia App Logo" />
+    <ViewWrapper backgroundColor="primary">
+      <MainContainer>
+        <img src={Logo} alt="Trivia App Logo" />
+      </MainContainer>
       <form onSubmit={handleSubmit}>
         <Input
           label="Name"
@@ -115,7 +119,7 @@ function JoinGame({
           JOIN
         </Button>
       </form>
-    </S.Wrapper>
+    </ViewWrapper>
   );
 }
 

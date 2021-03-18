@@ -39,10 +39,12 @@ export const ColorButton = styled.button<ColorButtonProps>`
   width: ${COLOR_BUTTON_SIZE}px;
   height: ${COLOR_BUTTON_SIZE}px;
   background: ${(props) => props.color};
-  border: 1px solid #3580b5;
+  border: ${(props) =>
+    props.isActive ? '4px solid #fff' : '1px solid #3580b5'};
   border-radius: 6px;
   margin-right: 5px;
+  outline-color: #fff;
   :last-of-type {
-    margin: 0;
+    margin-right: 0;
   }
 `;

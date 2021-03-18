@@ -1,6 +1,8 @@
-import React from 'react';
+import { FormEvent } from 'react';
 import * as S from './Lobby.style';
 
+import ViewWrapper from '../../components/ViewWrapper/ViewWrapper';
+import MainContainer from '../../components/MainContainer/MainContainer';
 import Button from '../../components/Button/Button';
 import PlayerDisplay from '../../components/PlayerDisplay/PlayerDisplay';
 import Player from '../../shared/Player';
@@ -18,8 +20,7 @@ function Lobby({ players, onSubmit }: Props) {
    * Submits the user's details
    * @param event The Form event
    */
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
-    //
+  const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     onSubmit(20, 'javascript');
   };
@@ -29,14 +30,14 @@ function Lobby({ players, onSubmit }: Props) {
   };
 
   return (
-    <S.Wrapper>
-      <S.MainContainer>
+    <ViewWrapper>
+      <MainContainer>
         <S.PlayersList>
           {players.map((player) => (
             <PlayerDisplay key={player.username} player={player} />
           ))}
         </S.PlayersList>
-      </S.MainContainer>
+      </MainContainer>
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="numQuestions">Questions:</label>
@@ -56,7 +57,7 @@ function Lobby({ players, onSubmit }: Props) {
           START
         </Button>
       </form>
-    </S.Wrapper>
+    </ViewWrapper>
   );
 }
 

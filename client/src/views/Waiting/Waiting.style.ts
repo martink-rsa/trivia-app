@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const Wrapper = styled.div`
+/* export const Wrapper = styled.div`
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -23,6 +23,7 @@ export const Wrapper = styled.div`
     }
   }
 `;
+ */
 
 export const MainContainer = styled.div`
   flex-grow: 1;
