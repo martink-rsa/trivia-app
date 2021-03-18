@@ -15,7 +15,7 @@ type StyleProps = {
 
 /** Baseline for generic styling that won't change */
 const BaselineButton = styled.button<StyleProps>`
-  font-size: 36px;
+  font-size: 2.25rem;
   font-weight: 600;
   background: none;
   border-radius: 35px;

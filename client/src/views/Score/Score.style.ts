@@ -1,31 +1,34 @@
 import styled from 'styled-components';
 
-export const Wrapper = styled.div`
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100%;
-  height: auto;
+export const Table = styled.table`
   width: 100%;
-  background-color: #fff;
-  padding: 50px 20px 50px 20px;
+  border-collapse: collapse;
 
-  form {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    button {
-      margin-top: 20px;
-    }
+  th {
+    text-align: left;
+    background: #fff;
   }
-`;
+  tr:first-of-type {
+  }
+  tr:nth-child(odd) {
+    background: #e1e1e1;
+  }
+  tr {
+    border-bottom: 1px solid black;
+  }
+  td {
+    padding: 4px 0;
+  }
 
-export const MainContainer = styled.div`
-  flex-grow: 1;
+  /* @media (max-width: 280px) {
+    font-size: 10px;
+    th:nth-child(2) {
+      background: red;
+      display: none;
+    }
+    td:nth-child(2) {
+      background: red;
+      display: none;
+    }
+  } */
 `;
-
-export const Table = styled.table``;

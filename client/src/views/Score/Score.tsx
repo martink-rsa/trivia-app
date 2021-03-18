@@ -1,4 +1,11 @@
+import { FormEvent } from 'react';
 import * as S from './Score.style';
+
+import ViewWrapper from '../../components/ViewWrapper/ViewWrapper';
+import MainContainer from '../../components/MainContainer/MainContainer';
+import PlayerIcons from '../../components/PlayerIcons/PlayerIcons';
+import Button from '../../components/Button/Button';
+import playerColors from '../../shared/playerColors';
 
 type Props = {
   scores: any[];
@@ -30,32 +37,49 @@ function Score({ scores }: Props) {
       })
       .sort((a: any, b: any): any => b.answersCorrect - a.answersCorrect);
 
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+  };
+
   return (
-    <S.Wrapper>
-      <h1>Score</h1>
-      <S.Table>
-        <thead>
-          <tr>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th>Correct</th>
-            <th>Score</th>
-          </tr>
-        </thead>
-        <tbody>
-          {parseScores(scores).map((player: any, index: any) => (
-            <tr key={player._id}>
-              <td>{index + 1}</td>
-              <td>ICON</td>
-              <td>{player.username}</td>
-              <td>{player.answersCorrect}</td>
-              <td>{Math.floor(Math.random() * 10)}</td>
+    <ViewWrapper>
+      <MainContainer fullWidth>
+        <h1>Score</h1>
+        <S.Table>
+          <thead>
+            <tr>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th>Correct</th>
+              <th>Score</th>
             </tr>
-          ))}
-        </tbody>
-      </S.Table>
-    </S.Wrapper>
+          </thead>
+          <tbody>
+            {parseScores(scores).map((player: any, index: any) => (
+              <tr key={player._id}>
+                <td>{index + 1}</td>
+                <td>
+                  <PlayerIcons
+                    id={player.iconId}
+                    color={playerColors[player.colorId]}
+                    size={30}
+                  />
+                </td>
+                <td>{player.username}</td>
+                <td>{player.answersCorrect}</td>
+                <td>{Math.floor(Math.random() * 10)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </S.Table>
+      </MainContainer>
+      <form onSubmit={handleSubmit}>
+        <Button type="submit" fullWidth>
+          MAIN MENU
+        </Button>
+      </form>
+    </ViewWrapper>
   );
 }
 

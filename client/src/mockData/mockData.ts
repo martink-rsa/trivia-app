@@ -64,10 +64,10 @@ export const mockPlayers = [
 
 export const mockScore = [
   {
-    username: 'EDXHGZSEIFNAGOND',
+    username: 'ABCDEFGHIJKLMNOP',
     _id: '604fb410be4de91b79b41956',
     iconId: 0,
-    color: '#ff00ff',
+    colorId: 0,
     answers: [
       { question: 0, correctAnswer: 2, playersAnswer: 3 },
       { question: 1, correctAnswer: 2, playersAnswer: 2 },
@@ -77,10 +77,10 @@ export const mockScore = [
     ],
   },
   {
-    username: 'EDXHGZSE',
-    _id: '604fb410be4de91b79b41956',
+    username: 'MARTINKRUGER',
+    _id: '604fb410be4de91b79b41952',
     iconId: 1,
-    color: '#ff0000',
+    colorId: 1,
     answers: [
       { question: 0, correctAnswer: 2, playersAnswer: 2 },
       { question: 1, correctAnswer: 2, playersAnswer: 2 },
@@ -91,9 +91,9 @@ export const mockScore = [
   },
   {
     username: 'EDXHGZSEIFNAGOD',
-    _id: '604fb410be4de91b79b41956',
+    _id: '604fb410be4de91b79b41951',
     iconId: 2,
-    color: '#0000ff',
+    colorId: 2,
     answers: [
       { question: 0, correctAnswer: 2, playersAnswer: 2 },
       { question: 1, correctAnswer: 2, playersAnswer: 1 },
@@ -104,9 +104,9 @@ export const mockScore = [
   },
   {
     username: 'EDXHGZSE',
-    _id: '604fb410be4de91b79b41956',
+    _id: '604fb410be4de91b79b41959',
     iconId: 1,
-    color: '#ff0000',
+    colorId: 3,
     answers: [
       { question: 0, correctAnswer: 2, playersAnswer: 1 },
       { question: 1, correctAnswer: 2, playersAnswer: 2 },

@@ -1,24 +1,9 @@
-import React, { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import * as S from './Game.style';
 
 import Button from '../../components/Button/Button';
 import Answer from '../../components/Answer/Answer';
-
-/* enum AnswerType {
-  'NORMAL' = 'NORMAL',
-  'MULTIPLE_CHOICE' = 'MULTIPLE_CHOICE',
-  'TRUE_FALSE' = 'TRUE_FALSE',
-}
-
-type Answer = {
-  text: string;
-  type: AnswerType;
-};
-
-type Question = {
-  question: string;
-  answers: Answer[];
-}; */
+import ViewWrapper from '../../components/ViewWrapper/ViewWrapper';
 
 type Props = {
   question: any;
@@ -35,13 +20,13 @@ function Game({ question, submitAnswer }: Props) {
    * Submits the answer for the question
    * @param event The Form event
    */
-  const onSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+  const onSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     submitAnswer(playerAnswer);
   };
 
   return (
-    <S.Wrapper>
+    <ViewWrapper>
       <S.Question>
         {question.questionNumber}: {question?.question?.text}
       </S.Question>
@@ -62,7 +47,7 @@ function Game({ question, submitAnswer }: Props) {
           GO
         </Button>
       </form>
-    </S.Wrapper>
+    </ViewWrapper>
   );
 }
 

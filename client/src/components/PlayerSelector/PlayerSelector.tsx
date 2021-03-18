@@ -1,11 +1,9 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, MouseEvent } from 'react';
 import * as S from './PlayerSelector.style';
+
 import PlayerIcons from '../PlayerIcons/PlayerIcons';
 import Caret from '../Icons/Caret/Caret';
-
 import playerColors from '../../shared/playerColors';
-
-// import Icons from '../../components/Icons/'
 
 type Props = {
   iconId: number;
@@ -13,22 +11,22 @@ type Props = {
   colorId: number;
   setColorId: Dispatch<SetStateAction<number>>;
 };
-function PlayerSelector({ iconId, setIconId, colorId, setColorId }: Props) {
-  const numIcons = 9;
 
-  const handleIconChange = (
-    event: React.MouseEvent<HTMLButtonElement>,
-  ): void => {
+const NUM_ICONS = 9;
+
+/** Shows a list of avatar icons and colors a player can choose from */
+function PlayerSelector({ iconId, setIconId, colorId, setColorId }: Props) {
+  const handleIconChange = (event: MouseEvent<HTMLButtonElement>): void => {
     const direction = event.currentTarget.value;
     if (direction === 'left') {
       if (iconId === 0) {
-        setIconId(numIcons - 1);
+        setIconId(NUM_ICONS - 1);
       } else {
         setIconId(iconId - 1);
       }
       //
     } else if (direction === 'right') {
-      if (iconId === numIcons - 1) {
+      if (iconId === NUM_ICONS - 1) {
         setIconId(0);
       } else {
         setIconId(iconId + 1);
@@ -36,9 +34,7 @@ function PlayerSelector({ iconId, setIconId, colorId, setColorId }: Props) {
     }
   };
 
-  const handleColorChange = (
-    event: React.MouseEvent<HTMLButtonElement>,
-  ): void => {
+  const handleColorChange = (event: MouseEvent<HTMLButtonElement>): void => {
     const index = event.currentTarget.value;
     setColorId(parseInt(index));
   };
@@ -57,6 +53,7 @@ function PlayerSelector({ iconId, setIconId, colorId, setColorId }: Props) {
       <S.ColorSelectionContainer>
         {playerColors.map((playerColor, index) => (
           <S.ColorButton
+            key={playerColor}
             color={playerColor}
             type="button"
             onClick={handleColorChange}

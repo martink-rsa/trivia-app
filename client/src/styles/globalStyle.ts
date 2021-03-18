@@ -38,6 +38,12 @@ const GlobalStyle = createGlobalStyle`
   .rotate-ccw-90 {
     transform: rotate(-90deg);
   }
+
+  @media (max-width: ${(props) => props.theme.breakpoints.xs}px) {
+    body {
+      font-size: 14px;
+    }
+  }
 `;
 
 export default GlobalStyle;

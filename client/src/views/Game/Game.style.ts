@@ -41,7 +41,7 @@ export const AnswersContainer = styled.ul`
 `;
 
 export const Timer = styled.div`
-  font-size: 22px;
+  font-size: 1.375rem;
   text-align: center;
   width: 100%;
 `;

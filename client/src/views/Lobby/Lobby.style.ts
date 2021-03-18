@@ -1,10 +1,10 @@
 import styled from 'styled-components';
 
-export const Wrapper = styled.div`
-  box-sizing: border-box;
+/* export const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-sizing: border-box;
   min-height: 100%;
   height: auto;
   width: 100%;
@@ -19,7 +19,7 @@ export const Wrapper = styled.div`
       margin-top: 20px;
     }
   }
-`;
+`; */
 
 export const MainContainer = styled.div`
   flex-grow: 1;
