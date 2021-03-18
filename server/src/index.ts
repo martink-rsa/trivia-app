@@ -49,7 +49,7 @@ serverIo.on('connection', (socket: Socket) => {
       // 2.2 Room is not empty
       // 3. Check username is taken or not
 
-      // Username
+      // Validation: Username
       const usernameNotValid = !validator.isAlphanumeric(username);
       if (!username) {
         return callback(Errors.noUsername);
@@ -58,13 +58,33 @@ serverIo.on('connection', (socket: Socket) => {
         return callback(Errors.invalidUsername);
       }
 
-      // Room
+      // Validation: Room
       const roomNotValid = !validator.isAlphanumeric(room);
       if (!room) {
         return callback(Errors.noRoom);
       }
       if (roomNotValid) {
         return callback(Errors.invalidRoom);
+      }
+
+      // Validation: Icon ID
+      const ICON_COUNT = 9;
+      const iconIdNotValid = !validator.isInt(iconId.toString());
+      if (iconIdNotValid) {
+        return callback(Errors.invalidIconIdType);
+      }
+      if (iconId < 0 || iconId > ICON_COUNT - 1) {
+        return callback(Errors.invalidIconIdValue);
+      }
+
+      // Validation: Icon ID
+      const COLOR_COUNT = 6;
+      const colorIdNotValid = !validator.isInt(colorId.toString());
+      if (colorIdNotValid) {
+        return callback(Errors.invalidColorIdType);
+      }
+      if (colorId < 0 || colorId > COLOR_COUNT - 1) {
+        return callback(Errors.invalidColorIdValue);
       }
 
       // Adding the user
@@ -165,7 +185,7 @@ serverIo.on('connection', (socket: Socket) => {
 
   // eslint-disable-next-line no-empty-pattern
   // eslint-disable-next-line consistent-return
-  socket.on('gameStart', async (_: any, callback: any) => {
+  socket.on('gameStart', async (data: any, callback: any) => {
     // * Only want admin to trigger the game starting
     // * Get the correct socketId admin id from the User model
     // * Check if the parameter is the same as the admin id
@@ -177,6 +197,8 @@ serverIo.on('connection', (socket: Socket) => {
     // The fetched room is what is used as the emit room target, otherwise we'd
     //    have to resort to a room name being passed as a param
     log.info('gameStart event');
+    console.log('gameStart data');
+    console.log(data);
     try {
       // Get the user using socket.io id
       const user = await User.findOne({ socketId: socket.id });
@@ -204,6 +226,7 @@ serverIo.on('connection', (socket: Socket) => {
           topic: 'javascript',
           numQuestions: 5,
           players: users,
+          questionDuration: 5000,
         };
 
         const game = new Game(config);
