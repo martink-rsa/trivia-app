@@ -25,6 +25,20 @@ enum GameStates {
   'SCORE' = 'SCORE',
 }
 
+type QuestionItem = {
+  text: string;
+};
+type AnswerItem = {
+  text: string;
+};
+
+type Question = {
+  questionNumber: number;
+  question: QuestionItem;
+  answers: AnswerItem[];
+  questionDuration: number;
+};
+
 function App() {
   /** The state of the game that determines what view/screen to be showing */
   const [gameState, setGameState] = useState<GameStates>(GameStates.INTRO);
@@ -39,7 +53,7 @@ function App() {
   const [colorId, setColorId] = useState(0);
 
   /** A question that is sent from the backend and is used for the trivia */
-  const [question, setQuestion] = useState(null);
+  const [question, setQuestion] = useState<Question | null>(null);
 
   /** Players that are still answering Trivia questions */
   const [playersInProgress, setPlayersInProgress] = useState([]);

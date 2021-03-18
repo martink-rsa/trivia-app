@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import * as S from './Game.style';
 
 import Button from '../../components/Button/Button';
@@ -16,6 +16,9 @@ type Props = {
 function Game({ question, submitAnswer }: Props) {
   const [playerAnswer, setPlayerAnswer] = useState<null | string>(null);
 
+  /** The countdown timer for the question in ms */
+  const [countdown, setCountdown] = useState(0);
+
   /**
    * Submits the answer for the question
    * @param event The Form event
@@ -23,6 +26,49 @@ function Game({ question, submitAnswer }: Props) {
   const onSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     submitAnswer(playerAnswer);
+  };
+
+  /** Creates a timer each time a new question is received */
+  useEffect(() => {
+    let timer: ReturnType<typeof setInterval>;
+    if (question) {
+      setCountdown(question.questionDuration);
+      timer = setInterval(() => {
+        setCountdown((prevState) => {
+          if (prevState === 0) {
+            return prevState;
+          }
+          return prevState - 1000;
+        });
+      }, 1000);
+    }
+    return () => {
+      clearInterval(timer);
+    };
+  }, [question]);
+
+  /**
+   * Adds a leading 0 to a single integer if less than 10
+   * @param {number} value An integer value
+   * @returns {string} String with leading 0 added
+   * @example
+   * addLeadingZero(5);
+   * // returns "05"
+   */
+  const addLeadingZero = (value: number) => (value < 10 ? `0${value}` : value);
+
+  /**
+   * Converts a millisecond value to a display time
+   * @param {number} timeInMs Time value in milliseconds
+   * @returns {string} .....
+   * @example
+   * convertMsToDisplayTime(5000);
+   * // returns "00:05"
+   */
+  const convertMsToDisplayTime = (timeInMs: number) => {
+    const seconds = Math.floor(timeInMs / 1000) % 60;
+    const minutes = Math.floor(timeInMs / (1000 * 60)) % 60;
+    return `${addLeadingZero(minutes)}:${addLeadingZero(seconds)}`;
   };
 
   return (
@@ -42,8 +88,12 @@ function Game({ question, submitAnswer }: Props) {
               />
             ))}
         </S.AnswersContainer>
-        <S.Timer>00:00</S.Timer>
-        <Button disabled={!playerAnswer} type="submit" fullWidth>
+        <S.Timer>{convertMsToDisplayTime(countdown)}</S.Timer>
+        <Button
+          disabled={!playerAnswer || countdown <= 0}
+          type="submit"
+          fullWidth
+        >
           GO
         </Button>
       </form>
