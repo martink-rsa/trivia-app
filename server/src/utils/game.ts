@@ -7,6 +7,7 @@ type Config = {
   topic: string;
   numQuestions: number;
   players: any[];
+  questionDuration: number;
 };
 
 type Answer = {
@@ -33,6 +34,7 @@ class Game {
   questionIndex: number;
   timer: null | ReturnType<typeof setInterval> = null;
   players: Player[];
+  questionDuration: number;
 
   constructor(config: Config) {
     this.roomName = config.roomName;
@@ -40,6 +42,7 @@ class Game {
     this.numQuestions = config.numQuestions;
     this.topic = config.topic;
     this.questionIndex = 0;
+    this.questionDuration = config.questionDuration;
     this.players = config.players.map((player) => {
       return {
         _id: player._id,
@@ -139,6 +142,7 @@ class Game {
       questionNumber: player.currentQuestion + 1,
       question: this.questions[player.currentQuestion].question,
       answers,
+      questionDuration: this.questionDuration,
     };
     // Set the correct answer for marking later
     player.answers[player.currentQuestion].correctAnswer = answers.indexOf(
@@ -146,7 +150,7 @@ class Game {
     );
 
     serverIo.to(player.socketId).emit('updateQuestion', questionData);
-    this.startQuestionTimer(5000, player);
+    this.startQuestionTimer(this.questionDuration, player);
   }
 
   /**
