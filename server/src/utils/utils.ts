@@ -1,4 +1,6 @@
-import { topics } from '../data/data';
+import axios from 'axios';
+// import { topics } from '../data/data';
+import Topics from './topics';
 
 /**
  * Generates a random number between the min and max values, with min and max
@@ -90,10 +92,11 @@ const getRandomNumbers = (
  * // returns 10 questions from 'javascript' topic
  */
 const getRandomQuestions = (topic: string, numberQuestions = 20) => {
+  const topics = Topics.getTopics();
   if (!{}.hasOwnProperty.call(topics, topic)) {
     throw new Error('Topic does not exist');
   }
-  const topicQuestions = topics[topic];
+  const topicQuestions = topics[topic].questions;
   const randomNumbers = getRandomNumbers(0, topicQuestions.length - 1, numberQuestions);
   const questions = randomNumbers.map((number) => topicQuestions[number]);
   return questions;

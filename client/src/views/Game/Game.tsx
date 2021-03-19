@@ -55,7 +55,8 @@ function Game({ question, submitAnswer }: Props) {
    * addLeadingZero(5);
    * // returns "05"
    */
-  const addLeadingZero = (value: number) => (value < 10 ? `0${value}` : value);
+  const addLeadingZero = (value: number): string =>
+    value < 10 ? `0${value}` : value.toString();
 
   /**
    * Converts a millisecond value to a display time
@@ -65,7 +66,7 @@ function Game({ question, submitAnswer }: Props) {
    * convertMsToDisplayTime(5000);
    * // returns "00:05"
    */
-  const convertMsToDisplayTime = (timeInMs: number) => {
+  const convertMsToDisplayTime = (timeInMs: number): string => {
     const seconds = Math.floor(timeInMs / 1000) % 60;
     const minutes = Math.floor(timeInMs / (1000 * 60)) % 60;
     return `${addLeadingZero(minutes)}:${addLeadingZero(seconds)}`;

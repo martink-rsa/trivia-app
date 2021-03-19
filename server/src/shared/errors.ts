@@ -53,6 +53,12 @@ const Errors = {
     info: 'The Color Id is not within the accepted constraints',
     field: 'colorId',
   },
+  // Questions API
+  questionsApiTopicsFailure: {
+    error: 'questionsApiTopicsFailure',
+    info: 'Unable to get the topics from the Questions API',
+    field: '',
+  },
   // Generic
   unknownError: {
     error: 'unknownError',
