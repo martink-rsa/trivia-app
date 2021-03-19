@@ -1,5 +1,3 @@
-import { getRandomQuestions } from './utils/utils';
-
 import { Server, Socket } from 'socket.io';
 import validator from 'validator';
 import * as http from 'http';
@@ -14,17 +12,22 @@ import Room from './models/room.model';
 
 import Game from './utils/game';
 
+import Topics from './utils/topics';
+
+import { getRandomQuestions } from './utils/utils';
+
+const PORT = process.env.PORT;
+// const QUESTIONS_SERVER_URL = process.env.QUESTIONS_SERVER_URL;
+
 const games = {};
 
-const port = process.env.PORT;
-
-const server = http.createServer(app).listen(port, () => {
-  console.log(`Express server listening on port ${port}`);
+const server = http.createServer(app).listen(PORT, () => {
+  console.log(`Express server listening on port ${PORT}`);
 });
 
 const serverIo = new Server(server, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: '*',
   },
 });
 
@@ -171,6 +174,10 @@ serverIo.on('connection', (socket: Socket) => {
         });
       }
 
+      const topics = Topics.getOnlyTopics();
+
+      socket.emit('updateTopics', topics);
+      // THIS DOES NOT SEEM RIGHT. UPDATE SENT TO ENTIRE ROOM?
       // Updating game state for user
       serverIo.to(room).emit('updateGameState', 'LOBBY');
 
@@ -183,8 +190,6 @@ serverIo.on('connection', (socket: Socket) => {
     },
   );
 
-  // eslint-disable-next-line no-empty-pattern
-  // eslint-disable-next-line consistent-return
   socket.on('gameStart', async (data: any, callback: any) => {
     // * Only want admin to trigger the game starting
     // * Get the correct socketId admin id from the User model
@@ -197,8 +202,10 @@ serverIo.on('connection', (socket: Socket) => {
     // The fetched room is what is used as the emit room target, otherwise we'd
     //    have to resort to a room name being passed as a param
     log.info('gameStart event');
-    console.log('gameStart data');
-    console.log(data);
+
+    const { selectedTopic, numberQuestions } = data;
+    console.log('TOPIC', selectedTopic, 'numberQuestions', numberQuestions);
+
     try {
       // Get the user using socket.io id
       const user = await User.findOne({ socketId: socket.id });
@@ -215,15 +222,15 @@ serverIo.on('connection', (socket: Socket) => {
 
       // See if player's id matches the admin id
       if (user._id.toString() === room.admin.toString()) {
-        log.info('Game starting', room.name, 'javascript', 5);
-        const questions = getRandomQuestions('javascript', 5);
+        log.info('Game starting', room.name, selectedTopic, numberQuestions);
+        const questions = getRandomQuestions(selectedTopic, numberQuestions);
 
         const users = [...room.users];
 
         const config = {
           roomName: room.name,
           questions: questions,
-          topic: 'javascript',
+          topic: selectedTopic,
           numQuestions: 5,
           players: users,
           questionDuration: 5000,
@@ -234,7 +241,6 @@ serverIo.on('connection', (socket: Socket) => {
         room.game = game;
 
         games[room._id] = game;
-        console.log(games);
         await room.save();
 
         room.game.startGame();

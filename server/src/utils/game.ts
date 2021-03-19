@@ -14,11 +14,15 @@ type Answer = {
   question: number;
   correctAnswer: null | number;
   playersAnswer: null | number;
+  startTime: number;
+  endTime: number;
 };
 
 type Player = {
   _id: string;
   username: string;
+  iconId: number;
+  colorId: number;
   socketId: string;
   currentQuestion: number;
   answers: Answer[];
@@ -47,12 +51,16 @@ class Game {
       return {
         _id: player._id,
         username: player.username,
+        iconId: player.iconId,
+        colorId: player.colorId,
         socketId: player.socketId,
         currentQuestion: 0,
         answers: config.questions.map((_, index) => ({
           question: index,
           correctAnswer: null,
           playersAnswer: null,
+          startTime: 0,
+          endTime: 0,
         })),
         timer: null,
         finished: false,
@@ -88,13 +96,20 @@ class Game {
         _id: currentPlayer._id,
         username: currentPlayer.username,
         answers: currentPlayer.answers,
+        iconId: currentPlayer.iconId,
+        colorId: currentPlayer.colorId,
       }));
       serverIo.to(this.roomName).emit('updateScore', score);
       serverIo.to(this.roomName).emit('updateGameState', 'SCORE');
     } else {
       const playersInProgress = this.players
         .filter((player) => !player.finished)
-        .map((player) => ({ _id: player._id, username: player.username }));
+        .map((player) => ({
+          _id: player._id,
+          username: player.username,
+          iconId: player.iconId,
+          colorId: player.colorId,
+        }));
       serverIo.to(player.socketId).emit('updateGameState', 'WAITING');
       serverIo.to(this.roomName).emit('updatePlayersInProgress', playersInProgress);
     }
@@ -106,6 +121,7 @@ class Game {
    * @param player The player's details
    */
   startQuestionTimer(duration: number, player: any): void {
+    player.answers[player.currentQuestion].startTime = Date.now();
     player.timer = setTimeout(() => {
       this.endQuestionTimer(player);
     }, duration);
@@ -151,6 +167,7 @@ class Game {
 
     serverIo.to(player.socketId).emit('updateQuestion', questionData);
     this.startQuestionTimer(this.questionDuration, player);
+    console.log(player);
   }
 
   /**
@@ -170,6 +187,7 @@ class Game {
     const player = this.players[playerIndex];
 
     // Cancelling the timer
+    player.answers[player.currentQuestion].endTime = Date.now();
     clearTimeout(player.timer);
 
     // Add the players answer to their answers. Do not need to mark answers atm,

@@ -43,6 +43,8 @@ function App() {
   /** The state of the game that determines what view/screen to be showing */
   const [gameState, setGameState] = useState<GameStates>(GameStates.INTRO);
 
+  const [topics, setTopics] = useState([]);
+
   /** Players that are in the room which is used to display a player list */
   const [players, setPlayers] = useState<Player[]>([]);
 
@@ -78,6 +80,10 @@ function App() {
       );
       handleGameState(data);
     });
+    socket.on('updateTopics', (data: any) => {
+      console.log('Server emitted: updateTopics - Updating topics list');
+      setTopics(data);
+    });
     socket.on('updatePlayers', (data: any) => {
       console.log('Server emitted: updatePlayers - Updating player list');
       setPlayers(data);
@@ -104,11 +110,15 @@ function App() {
    * @param numberQuestions Number of questions for the trivia
    * @param subject The subject/scope of the questions e.g. javascript
    */
-  const triggerGameStart = (numberQuestions: number, subject: string) => {
+  const triggerGameStart = (numberQuestions: number, selectedTopic: string) => {
     console.log('Client emit: triggerGameStart - Attempt to start the game');
-    socket.emit('gameStart', { numberQuestions, subject }, (callback: any) => {
-      console.log('Callback: gameStart - ', callback);
-    });
+    socket.emit(
+      'gameStart',
+      { numberQuestions, selectedTopic },
+      (callback: any) => {
+        console.log('Callback: gameStart - ', callback);
+      },
+    );
   };
 
   /**
@@ -168,7 +178,9 @@ function App() {
       />
     );
   } else if (gameState === GameStates.LOBBY) {
-    return <Lobby players={players} onSubmit={triggerGameStart} />;
+    return (
+      <Lobby players={players} onSubmit={triggerGameStart} topics={topics} />
+    );
   } else if (gameState === GameStates.GAME) {
     return <Game question={question} submitAnswer={submitAnswer} />;
   } else if (gameState === GameStates.WAITING) {

@@ -6,15 +6,15 @@ export const Table = styled.table`
 
   th {
     text-align: left;
-    background: #fff;
+    background-color: #fff;
   }
   tr:first-of-type {
   }
   tr:nth-child(odd) {
-    background: #e1e1e1;
+    background-color: rgba(81, 182, 254, 0.19);
   }
   tr {
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid ${(props) => props.theme.color.primary};
   }
   td {
     padding: 4px 0;
