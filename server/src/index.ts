@@ -99,6 +99,7 @@ serverIo.on('connection', (socket: Socket) => {
           iconId,
           colorId,
           socketId: socket.id,
+          isAdmin: false,
         });
         newUser = await user.save();
       } catch (error) {
@@ -156,6 +157,9 @@ serverIo.on('connection', (socket: Socket) => {
         });
         await newRoom.save();
         log.info('User created room');
+        newUser.isAdmin = true;
+        await newUser.save();
+        log.info('User made admin of new room');
       }
 
       // Socket.io add user to room
@@ -271,8 +275,31 @@ serverIo.on('connection', (socket: Socket) => {
   });
   /** User has disconnected from websocket */
   socket.on('disconnect', async () => {
+    // 1. Delete player from room
+    // 1. If player was admin, assign new admin
+    // 2. Update room player list
+    // 4. If no players left, delete MongoDB room and sockets.io room
+
     console.log('Server: - Disconnected ID:', socket.id);
-    await User.deleteOne({ socketId: socket.id });
+    const user = await User.findOne({ socketId: socket.id });
+
+    if (user) {
+      // await User.deleteOne({ socketId: socket.id });
+      user.deleteOne();
+      /* const room = await Room.findOne({ users: user });
+      if (room.users.length <= 1) {
+        Room.deleteOne(room);
+      } else {
+        if (user._id.toString() === room.admin.toString()) {
+          console.log('USER WAS ADMIN');
+          console.log(room.users);
+        }
+      } */
+    }
+    // console.log(user);
+    // console.log('')
+    // const userDeleted = await User.deleteOne({ socketId: socket.id });
+    // console.log(userDeleted);
     // console.log('Clients connected:', serverIo.engine.clientsCount);
 
     // This will delete a user, but it is not currently the correct
@@ -306,4 +333,4 @@ serverIo.on('connection', (socket: Socket) => {
   });
 });
 
-export { serverIo, server };
+export { serverIo, server, games };

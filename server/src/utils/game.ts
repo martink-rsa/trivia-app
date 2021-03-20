@@ -203,6 +203,16 @@ class Game {
     }
   }
 
+  handlePlayerLeaving(playerId): void {
+    console.log('Game: Handle player leaving');
+    const playerIndex = this.players.findIndex(
+      (player) => player._id.toString() === playerId.toString(),
+    );
+    const player = this.players[playerIndex];
+    console.log(player);
+    this.setPlayerFinished(player);
+  }
+
   /**
    * Start the game for all players
    */
