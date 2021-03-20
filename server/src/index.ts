@@ -233,7 +233,7 @@ serverIo.on('connection', (socket: Socket) => {
           topic: selectedTopic,
           numQuestions: 5,
           players: users,
-          questionDuration: 5000,
+          questionDuration: 500000,
         };
 
         const game = new Game(config);

@@ -29,6 +29,11 @@ const GlobalStyle = createGlobalStyle`
     cursor: pointer;
   }
 
+  code, pre {
+    background: none !important;
+  }
+
+
   .rotate-cw-90 {
     transform: rotate(90deg);
   }
