@@ -1,9 +1,25 @@
 import { useState, useEffect, FormEvent } from 'react';
 import * as S from './Game.style';
+import ReactMarkdown from 'react-markdown';
 
 import Button from '../../components/Button/Button';
 import Answer from '../../components/Answer/Answer';
 import ViewWrapper from '../../components/ViewWrapper/ViewWrapper';
+
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { materialLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+const renderers = {
+  code: ({ language, value }: { language: any; value: any }) => {
+    return (
+      <SyntaxHighlighter
+        style={materialLight}
+        language={language}
+        children={value}
+      />
+    );
+  },
+};
 
 type Props = {
   question: any;
@@ -74,8 +90,12 @@ function Game({ question, submitAnswer }: Props) {
 
   return (
     <ViewWrapper>
+      {/* {question.questionNumber} */}
       <S.Question>
-        {question.questionNumber}: {question?.question?.text}
+        <ReactMarkdown
+          renderers={renderers}
+          children={question?.question?.text}
+        />
       </S.Question>
       <form onSubmit={onSubmit}>
         <S.AnswersContainer>

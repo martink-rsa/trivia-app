@@ -18,7 +18,7 @@ type Props = {
  */
 function Lobby({ players, topics, onSubmit }: Props) {
   const [topicSelected, setTopicSelected] = useState(topics[0].id);
-  const [numQuestions, setNumQuestions] = useState(6);
+  const [numQuestions, setNumQuestions] = useState(3);
 
   /**
    * Submits the user's details
@@ -60,7 +60,7 @@ function Lobby({ players, topics, onSubmit }: Props) {
           <S.Input
             type="number"
             id="numQuestions"
-            min="5"
+            min="1"
             max="50"
             value={numQuestions}
             onChange={changeNumQuestions}
