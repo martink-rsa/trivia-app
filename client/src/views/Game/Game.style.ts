@@ -2,7 +2,6 @@ import styled from 'styled-components';
 
 export const Question = styled.div`
   flex-grow: 1;
-  text-align: center;
   margin-top: 0;
   h1,
   h2,

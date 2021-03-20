@@ -6,20 +6,8 @@ import Button from '../../components/Button/Button';
 import Answer from '../../components/Answer/Answer';
 import ViewWrapper from '../../components/ViewWrapper/ViewWrapper';
 
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { materialLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
-
-const renderers = {
-  code: ({ language, value }: { language: any; value: any }) => {
-    return (
-      <SyntaxHighlighter
-        style={materialLight}
-        language={language}
-        children={value}
-      />
-    );
-  },
-};
+import { convertMsToDisplayTime } from '../../utils/utils';
+import { renderers } from '../../utils/syntaxHighlighter';
 
 type Props = {
   question: any;
@@ -46,6 +34,9 @@ function Game({ question, submitAnswer }: Props) {
 
   /** Creates a timer each time a new question is received */
   useEffect(() => {
+    // Reset the players selection
+    setPlayerAnswer(null);
+
     let timer: ReturnType<typeof setInterval>;
     if (question) {
       setCountdown(question.questionDuration);
@@ -62,31 +53,6 @@ function Game({ question, submitAnswer }: Props) {
       clearInterval(timer);
     };
   }, [question]);
-
-  /**
-   * Adds a leading 0 to a single integer if less than 10
-   * @param {number} value An integer value
-   * @returns {string} String with leading 0 added
-   * @example
-   * addLeadingZero(5);
-   * // returns "05"
-   */
-  const addLeadingZero = (value: number): string =>
-    value < 10 ? `0${value}` : value.toString();
-
-  /**
-   * Converts a millisecond value to a display time
-   * @param {number} timeInMs Time value in milliseconds
-   * @returns {string} .....
-   * @example
-   * convertMsToDisplayTime(5000);
-   * // returns "00:05"
-   */
-  const convertMsToDisplayTime = (timeInMs: number): string => {
-    const seconds = Math.floor(timeInMs / 1000) % 60;
-    const minutes = Math.floor(timeInMs / (1000 * 60)) % 60;
-    return `${addLeadingZero(minutes)}:${addLeadingZero(seconds)}`;
-  };
 
   return (
     <ViewWrapper>

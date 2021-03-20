@@ -7,8 +7,8 @@ import log from './utils/log';
 
 import Errors from './shared/errors';
 
-import User from './models/user.model';
-import Room from './models/room.model';
+import User, { IUser } from './models/user.model';
+import Room, { IRoom } from './models/room.model';
 
 import Game from './utils/game';
 
@@ -121,9 +121,8 @@ serverIo.on('connection', (socket: Socket) => {
       // 1. Check room exists
       // 1.1 If room exists, add user to room
       // 1.2 If room doesn't exist, create room with user as admin
-      let foundRoom;
+      let foundRoom: IRoom;
       try {
-        // eslint-disable-next-line semi
         foundRoom = await Room.findOne({ name: room });
       } catch (error) {
         console.log(error);
@@ -156,7 +155,6 @@ serverIo.on('connection', (socket: Socket) => {
           topic: 'Programming',
         });
         await newRoom.save();
-        // savedRoom = await newRoom.save();
         log.info('User created room');
       }
 
@@ -185,8 +183,15 @@ serverIo.on('connection', (socket: Socket) => {
       const currentRoom = await (
         await Room.findOne({ name: room }).populate('users')
       ).execPopulate();
-      const { users } = currentRoom;
-      serverIo.to(room).emit('updatePlayers', users);
+      const { users } = currentRoom.toObject();
+
+      // Adding 'isAdmin' flag
+      const updatedUsers = users.map((user: IUser) => ({
+        ...user,
+        isAdmin: user._id.toString() === currentRoom.admin.toString(),
+      }));
+
+      serverIo.to(room).emit('updatePlayers', updatedUsers);
     },
   );
 
