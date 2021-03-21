@@ -8,6 +8,7 @@ export const renderers = {
         style={materialLight}
         language={language}
         children={value}
+        wrapLongLines={true}
       />
     );
   },

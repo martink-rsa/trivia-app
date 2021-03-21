@@ -181,7 +181,8 @@ serverIo.on('connection', (socket: Socket) => {
       socket.emit('updateTopics', topics);
       // THIS DOES NOT SEEM RIGHT. UPDATE SENT TO ENTIRE ROOM?
       // Updating game state for user
-      serverIo.to(room).emit('updateGameState', 'LOBBY');
+      // serverIo.to(room).emit('updateGameState', 'LOBBY');
+      socket.emit('updateGameState', 'LOBBY');
 
       // Get the players in the room
       const currentRoom = await (
@@ -242,7 +243,7 @@ serverIo.on('connection', (socket: Socket) => {
           topic: selectedTopic,
           numQuestions: 5,
           players: users,
-          questionDuration: 500000,
+          questionDuration: 1000000,
         };
 
         const game = new Game(config);

@@ -54,6 +54,15 @@ function Game({ question, submitAnswer }: Props) {
     };
   }, [question]);
 
+  const addKeyIds = (array: any[]): any[] => {
+    return array.map((item: any, index: number) => ({
+      ...item,
+      keyId: index,
+    }));
+  };
+
+  console.log(addKeyIds(question.answers));
+
   return (
     <ViewWrapper>
       {/* {question.questionNumber} */}
@@ -66,8 +75,11 @@ function Game({ question, submitAnswer }: Props) {
       <form onSubmit={onSubmit}>
         <S.AnswersContainer>
           {question &&
-            question.answers.map((answer: { text: string }, index: number) => (
+            addKeyIds(
+              question.answers,
+            ).map((answer: { text: string; keyId: number }, index: number) => (
               <Answer
+                key={answer.keyId}
                 index={index}
                 text={answer.text}
                 isSelected={index.toString() === playerAnswer}
