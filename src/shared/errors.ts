@@ -53,6 +53,34 @@ const Errors = {
     info: 'The Color Id is not within the accepted constraints',
     field: 'colorId',
   },
+  // NumberQuestions
+  invalidTopicValue: {
+    error: 'invalidTopicValue',
+    info: 'The Topic is invalid, must be one of the available topics',
+    field: 'selectedTopic',
+  },
+  // NumberQuestions
+  invalidNumberQuestionsType: {
+    error: 'invalidNumberQuestionsType',
+    info: 'The Number Questions is invalid, must be an integer',
+    field: 'numberQuestions',
+  },
+  invalidNumberQuestionsValue: {
+    error: 'invalidNumberQuestionsValue',
+    info: 'The Number Questions is not within the accepted constraints',
+    field: 'numberQuestions',
+  },
+  // QuestionsDuration
+  invalidQuestionsDurationType: {
+    error: 'invalidQuestionsDurationType',
+    info: 'The Questions Duration is invalid, must be an integer',
+    field: 'questionsDuration',
+  },
+  invalidQuestionsDurationValue: {
+    error: 'invalidQuestionsDurationValue',
+    info: 'The Questions Duration is not within the accepted constraints',
+    field: 'questionsDuration',
+  },
   // Questions API
   questionsApiTopicsFailure: {
     error: 'questionsApiTopicsFailure',

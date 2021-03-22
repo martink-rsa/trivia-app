@@ -112,7 +112,6 @@ class Game {
       // 2. Delete room
       // 3. Delete game obj
       this.players.forEach(async (player) => {
-        console.log(player._id);
         await User.deleteOne({ _id: player._id });
       });
       await Room.deleteOne({ name: this.roomName });
@@ -178,12 +177,11 @@ class Game {
     };
     // Set the correct answer for marking later
     player.answers[player.currentQuestion].correctAnswer = answers.indexOf(
-      this.questions[player.currentQuestion].correctAnswer,
+      this.questions[player.currentQuestion].correctAnswer
     );
 
     serverIo.to(player.socketId).emit('updateQuestion', questionData);
     this.startQuestionTimer(this.questionDuration, player);
-    console.log(player);
   }
 
   /**
@@ -198,7 +196,7 @@ class Game {
     // 2. Mark the question (Optional, not currently doing this as we mark everything at once)
     // 3. Start a new question
     const playerIndex = this.players.findIndex(
-      (player) => player._id.toString() === playerId.toString(),
+      (player) => player._id.toString() === playerId.toString()
     );
     const player = this.players[playerIndex];
 
@@ -220,12 +218,10 @@ class Game {
   }
 
   handlePlayerLeaving(playerId): void {
-    console.log('Game: Handle player leaving');
     const playerIndex = this.players.findIndex(
-      (player) => player._id.toString() === playerId.toString(),
+      (player) => player._id.toString() === playerId.toString()
     );
     const player = this.players[playerIndex];
-    console.log(player);
     this.setPlayerFinished(player);
   }
 
