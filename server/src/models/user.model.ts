@@ -67,7 +67,6 @@ userSchema.pre('deleteOne', { document: true, query: false }, async function () 
       .then(() => {
         log.success('Last user in room left, deleted room');
       })
-      // eslint-disable-next-line node/handle-callback-err
       .catch((error) => {
         throw new Error(error);
       });

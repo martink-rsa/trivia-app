@@ -238,6 +238,7 @@ serverIo.on('connection', (socket: Socket) => {
         const users = [...room.users];
 
         const config = {
+          roomId: room._id,
           roomName: room.name,
           questions: questions,
           topic: selectedTopic,
@@ -271,6 +272,10 @@ serverIo.on('connection', (socket: Socket) => {
     games[room._id].handleAnswer(parseInt(index), user._id);
   });
 
+  socket.on('backToJoinGame', async () => {
+    serverIo.emit('updateGameState', 'JOIN');
+  });
+
   socket.on('testMessage', async () => {
     console.log('Server: Test message received');
   });
@@ -297,25 +302,6 @@ serverIo.on('connection', (socket: Socket) => {
         }
       } */
     }
-    // console.log(user);
-    // console.log('')
-    // const userDeleted = await User.deleteOne({ socketId: socket.id });
-    // console.log(userDeleted);
-    // console.log('Clients connected:', serverIo.engine.clientsCount);
-
-    // This will delete a user, but it is not currently the correct
-    //  step to take because a user might not have joined the room yet
-    // It needs to be called in something like a 'leaveRoom' event
-    /* try {
-      await User.findOneAndDelete({ socketId: socket.id });
-      console.log(
-        chalk.green.inverse.bold(' SUCCESS '),
-        `User deleted: ${socket.id}`,
-      );
-    } catch (error) {
-      console.log(error);
-      console.log('ERROR DELETING USER?');
-    } */
   });
 
   // This adapter will automatically be called with the 'on' events
