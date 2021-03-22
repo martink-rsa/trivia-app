@@ -4,6 +4,7 @@ Todo:
 
 1. Input validation for iconId and colorId when user joins room
 2. Remove a player from the game class if they have left the room / closed the browser
+3. Handle playing joining game in progress which will currently set everything back to lobby.
 
 Issues:
 

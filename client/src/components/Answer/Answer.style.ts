@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const Wrapper = styled.div`
-  margin: 30px 0;
+  margin: 15px 0;
   width: 100%;
 `;
 
@@ -15,8 +15,10 @@ export const Label = styled.label<LabelProps>`
   width: 100%;
   padding: 10px 10px;
   cursor: pointer;
-  background: ${(props) =>
-    props.isSelected ? props.theme.color.primary : 'none'};
+  border: ${(props) =>
+    props.isSelected
+      ? `4px solid ${props.theme.color.primary}`
+      : '4px solid #fff'};
   border-radius: 35px;
   :hover div > div {
     background: ${(props) => !props.isSelected && props.theme.color.primary};
@@ -33,6 +35,7 @@ export const Number = styled.div`
   justify-content: center;
   border-radius: 50%;
   width: 40px;
+  min-width: 40px;
   height: 40px;
   background: #c4c4c4;
   margin-right: 10px;

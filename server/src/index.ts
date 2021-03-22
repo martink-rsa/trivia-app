@@ -7,8 +7,8 @@ import log from './utils/log';
 
 import Errors from './shared/errors';
 
-import User from './models/user.model';
-import Room from './models/room.model';
+import User, { IUser } from './models/user.model';
+import Room, { IRoom } from './models/room.model';
 
 import Game from './utils/game';
 
@@ -99,6 +99,7 @@ serverIo.on('connection', (socket: Socket) => {
           iconId,
           colorId,
           socketId: socket.id,
+          isAdmin: false,
         });
         newUser = await user.save();
       } catch (error) {
@@ -121,9 +122,8 @@ serverIo.on('connection', (socket: Socket) => {
       // 1. Check room exists
       // 1.1 If room exists, add user to room
       // 1.2 If room doesn't exist, create room with user as admin
-      let foundRoom;
+      let foundRoom: IRoom;
       try {
-        // eslint-disable-next-line semi
         foundRoom = await Room.findOne({ name: room });
       } catch (error) {
         console.log(error);
@@ -156,8 +156,10 @@ serverIo.on('connection', (socket: Socket) => {
           topic: 'Programming',
         });
         await newRoom.save();
-        // savedRoom = await newRoom.save();
         log.info('User created room');
+        newUser.isAdmin = true;
+        await newUser.save();
+        log.info('User made admin of new room');
       }
 
       // Socket.io add user to room
@@ -179,14 +181,22 @@ serverIo.on('connection', (socket: Socket) => {
       socket.emit('updateTopics', topics);
       // THIS DOES NOT SEEM RIGHT. UPDATE SENT TO ENTIRE ROOM?
       // Updating game state for user
-      serverIo.to(room).emit('updateGameState', 'LOBBY');
+      // serverIo.to(room).emit('updateGameState', 'LOBBY');
+      socket.emit('updateGameState', 'LOBBY');
 
       // Get the players in the room
       const currentRoom = await (
         await Room.findOne({ name: room }).populate('users')
       ).execPopulate();
-      const { users } = currentRoom;
-      serverIo.to(room).emit('updatePlayers', users);
+      const { users } = currentRoom.toObject();
+
+      // Adding 'isAdmin' flag
+      const updatedUsers = users.map((user: IUser) => ({
+        ...user,
+        isAdmin: user._id.toString() === currentRoom.admin.toString(),
+      }));
+
+      serverIo.to(room).emit('updatePlayers', updatedUsers);
     },
   );
 
@@ -228,12 +238,13 @@ serverIo.on('connection', (socket: Socket) => {
         const users = [...room.users];
 
         const config = {
+          roomId: room._id,
           roomName: room.name,
           questions: questions,
           topic: selectedTopic,
           numQuestions: 5,
           players: users,
-          questionDuration: 500000,
+          questionDuration: 1000000,
         };
 
         const game = new Game(config);
@@ -261,28 +272,36 @@ serverIo.on('connection', (socket: Socket) => {
     games[room._id].handleAnswer(parseInt(index), user._id);
   });
 
+  socket.on('backToJoinGame', async () => {
+    serverIo.emit('updateGameState', 'JOIN');
+  });
+
   socket.on('testMessage', async () => {
     console.log('Server: Test message received');
   });
   /** User has disconnected from websocket */
   socket.on('disconnect', async () => {
-    console.log('Server: - Disconnected ID:', socket.id);
-    await User.deleteOne({ socketId: socket.id });
-    // console.log('Clients connected:', serverIo.engine.clientsCount);
+    // 1. Delete player from room
+    // 1. If player was admin, assign new admin
+    // 2. Update room player list
+    // 4. If no players left, delete MongoDB room and sockets.io room
 
-    // This will delete a user, but it is not currently the correct
-    //  step to take because a user might not have joined the room yet
-    // It needs to be called in something like a 'leaveRoom' event
-    /* try {
-      await User.findOneAndDelete({ socketId: socket.id });
-      console.log(
-        chalk.green.inverse.bold(' SUCCESS '),
-        `User deleted: ${socket.id}`,
-      );
-    } catch (error) {
-      console.log(error);
-      console.log('ERROR DELETING USER?');
-    } */
+    console.log('Server: - Disconnected ID:', socket.id);
+    const user = await User.findOne({ socketId: socket.id });
+
+    if (user) {
+      // await User.deleteOne({ socketId: socket.id });
+      user.deleteOne();
+      /* const room = await Room.findOne({ users: user });
+      if (room.users.length <= 1) {
+        Room.deleteOne(room);
+      } else {
+        if (user._id.toString() === room.admin.toString()) {
+          console.log('USER WAS ADMIN');
+          console.log(room.users);
+        }
+      } */
+    }
   });
 
   // This adapter will automatically be called with the 'on' events
@@ -301,4 +320,4 @@ serverIo.on('connection', (socket: Socket) => {
   });
 });
 
-export { serverIo, server };
+export { serverIo, server, games };

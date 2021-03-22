@@ -1,7 +1,10 @@
-import { serverIo } from '../index';
+import User from '../models/user.model';
+import { serverIo, games } from '../index';
 import { shuffleFisherYates } from '../utils/utils';
+import Room from '../models/room.model';
 
 type Config = {
+  roomId: string;
   roomName: string;
   questions: any[];
   topic: string;
@@ -32,6 +35,7 @@ type Player = {
 
 class Game {
   questions: any[];
+  roomId: string;
   roomName: string;
   topic: string;
   numQuestions: number;
@@ -41,6 +45,7 @@ class Game {
   questionDuration: number;
 
   constructor(config: Config) {
+    this.roomId = config.roomId;
     this.roomName = config.roomName;
     this.questions = config.questions;
     this.numQuestions = config.numQuestions;
@@ -81,7 +86,7 @@ class Game {
    * Checks if the player has finished the game
    * @param player The player's details
    */
-  setPlayerFinished(player: any): void {
+  async setPlayerFinished(player: any): Promise<void> {
     // If player is finished, then:
     // 1. Check if room is finished.
     // 1.1 If room is not finished:
@@ -101,6 +106,17 @@ class Game {
       }));
       serverIo.to(this.roomName).emit('updateScore', score);
       serverIo.to(this.roomName).emit('updateGameState', 'SCORE');
+
+      // Clearing the game:
+      // 1. Delete all players
+      // 2. Delete room
+      // 3. Delete game obj
+      this.players.forEach(async (player) => {
+        console.log(player._id);
+        await User.deleteOne({ _id: player._id });
+      });
+      await Room.deleteOne({ name: this.roomName });
+      delete games[this.roomId];
     } else {
       const playersInProgress = this.players
         .filter((player) => !player.finished)
@@ -201,6 +217,16 @@ class Game {
     } else {
       this.setPlayerFinished(player);
     }
+  }
+
+  handlePlayerLeaving(playerId): void {
+    console.log('Game: Handle player leaving');
+    const playerIndex = this.players.findIndex(
+      (player) => player._id.toString() === playerId.toString(),
+    );
+    const player = this.players[playerIndex];
+    console.log(player);
+    this.setPlayerFinished(player);
   }
 
   /**

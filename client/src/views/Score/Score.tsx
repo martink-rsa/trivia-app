@@ -9,12 +9,13 @@ import playerColors from '../../shared/playerColors';
 
 type Props = {
   scores: any[];
+  onSubmit: () => void;
 };
 
 /** The Score screen that displays at the end of a game and shows
  * all of the player's scores
  */
-function Score({ scores }: Props) {
+function Score({ scores, onSubmit }: Props) {
   /**
    * Parses a list of players with scores and then calculates their total answers
    * correct as well as their total score
@@ -39,6 +40,7 @@ function Score({ scores }: Props) {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    onSubmit();
   };
 
   return (

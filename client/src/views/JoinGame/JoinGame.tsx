@@ -57,13 +57,12 @@ function JoinGame({
    */
   const changePlayerName = (event: FormEvent<HTMLInputElement>): void => {
     const { value } = event.currentTarget as HTMLInputElement;
-    /* if (value.match(/^[A-Za-z0-9]+$/)) {
+    if (value.match(/^[A-Za-z0-9]+$/)) {
       setPlayerName(value);
     }
     if (value === '') {
       setPlayerName('');
-    } */
-    setPlayerName(value);
+    }
   };
 
   /**

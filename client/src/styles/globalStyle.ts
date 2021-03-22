@@ -30,6 +30,8 @@ const GlobalStyle = createGlobalStyle`
   }
 
   code, pre {
+    padding: 0 0 !important;
+    margin: 0 !important;
     background: none !important;
   }
 

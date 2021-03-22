@@ -1,4 +1,6 @@
 import * as S from './Answer.style';
+import ReactMarkdown from 'react-markdown';
+import { renderers } from '../../utils/syntaxHighlighter';
 
 type Props = {
   index: number;
@@ -29,7 +31,7 @@ function Answer({ index, text, isSelected, setPlayerAnswer }: Props) {
       <S.Label htmlFor={`trivia-answer-${index}`} isSelected={isSelected}>
         <S.Content>
           <S.Number>{index + 1}</S.Number>
-          {text}
+          <ReactMarkdown renderers={renderers} children={text} />
         </S.Content>
       </S.Label>
     </S.Wrapper>

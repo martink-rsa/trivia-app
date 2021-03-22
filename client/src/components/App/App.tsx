@@ -18,7 +18,7 @@ const SERVER = 'http://localhost:3001';
 let socket: any;
 
 enum GameStates {
-  'INTRO' = 'INTRO',
+  'JOIN' = 'JOIN',
   'LOBBY' = 'LOBBY',
   'GAME' = 'GAME',
   'WAITING' = 'WAITING',
@@ -41,7 +41,7 @@ type Question = {
 
 function App() {
   /** The state of the game that determines what view/screen to be showing */
-  const [gameState, setGameState] = useState<GameStates>(GameStates.INTRO);
+  const [gameState, setGameState] = useState<GameStates>(GameStates.JOIN);
 
   const [topics, setTopics] = useState([]);
 
@@ -164,7 +164,14 @@ function App() {
     );
   };
 
-  if (gameState === GameStates.INTRO) {
+  const handleMainMenu = () => {
+    console.log('handleMainMenu');
+    socket.emit('backToJoinGame', (callback: any) => {
+      console.log('Callback: backToJoinGame', callback);
+    });
+  };
+
+  if (gameState === GameStates.JOIN) {
     // return <Score scores={mockScore} />;
     // return <Waiting playersInProgress={mockPlayersInProgress} />;
 
@@ -186,7 +193,7 @@ function App() {
   } else if (gameState === GameStates.WAITING) {
     return <Waiting playersInProgress={playersInProgress} />;
   } else if (gameState === GameStates.SCORE) {
-    return <Score scores={score} />;
+    return <Score scores={score} onSubmit={handleMainMenu} />;
   } else {
     return <div>else returned</div>;
   }
