@@ -114,7 +114,7 @@ serverIo.on('connection', (socket: Socket) => {
       log.success(`User Added: ${newUser.username} -> ${room}`);
       log('------------------------------------');
       Object.keys(newUser._doc).forEach((field) =>
-        log(`◦ ${field}: ${newUser._doc[field]}`),
+        log(`◦ ${field}: ${newUser._doc[field]}`)
       );
       log('====================================');
 
@@ -179,9 +179,7 @@ serverIo.on('connection', (socket: Socket) => {
       const topics = Topics.getOnlyTopics();
 
       socket.emit('updateTopics', topics);
-      // THIS DOES NOT SEEM RIGHT. UPDATE SENT TO ENTIRE ROOM?
       // Updating game state for user
-      // serverIo.to(room).emit('updateGameState', 'LOBBY');
       socket.emit('updateGameState', 'LOBBY');
 
       // Get the players in the room
@@ -197,7 +195,11 @@ serverIo.on('connection', (socket: Socket) => {
       }));
 
       serverIo.to(room).emit('updatePlayers', updatedUsers);
-    },
+      const successMessage = {
+        status: 200,
+      };
+      callback(successMessage);
+    }
   );
 
   socket.on('gameStart', async (data: any, callback: any) => {
@@ -213,8 +215,45 @@ serverIo.on('connection', (socket: Socket) => {
     //    have to resort to a room name being passed as a param
     log.info('gameStart event');
 
-    const { selectedTopic, numberQuestions } = data;
-    console.log('TOPIC', selectedTopic, 'numberQuestions', numberQuestions);
+    const { selectedTopic, numberQuestions, questionsDuration } = data;
+    log.info(
+      'Topic:',
+      selectedTopic,
+      'questions:',
+      numberQuestions,
+      'duration:',
+      questionsDuration
+    );
+
+    // Validation: Topics
+    const topics = Topics.getOnlyTopics();
+    const isTopic = topics.reduce((foundTopic, topic) => {
+      if (topic.id === selectedTopic) {
+        foundTopic = true;
+      }
+      return foundTopic;
+    }, false);
+    if (!isTopic) {
+      return callback(Errors.invalidTopicValue);
+    }
+
+    // Validation: Number of questions
+    const numberQuestionsInvalidType = typeof numberQuestions !== 'number';
+    if (numberQuestionsInvalidType) {
+      return callback(Errors.invalidNumberQuestionsType);
+    }
+    if (numberQuestions <= 0 || numberQuestions >= 99) {
+      return callback(Errors.invalidNumberQuestionsValue);
+    }
+
+    // Validation: Questions duration
+    const questionsDurationInvalidType = typeof questionsDuration !== 'number';
+    if (questionsDurationInvalidType) {
+      return callback(Errors.invalidQuestionsDurationType);
+    }
+    if (questionsDuration <= 0 || questionsDuration >= 21) {
+      return callback(Errors.invalidQuestionsDurationValue);
+    }
 
     try {
       // Get the user using socket.io id
@@ -244,7 +283,7 @@ serverIo.on('connection', (socket: Socket) => {
           topic: selectedTopic,
           numQuestions: 5,
           players: users,
-          questionDuration: 1000000,
+          questionDuration: questionsDuration * 1000,
         };
 
         const game = new Game(config);
@@ -290,17 +329,7 @@ serverIo.on('connection', (socket: Socket) => {
     const user = await User.findOne({ socketId: socket.id });
 
     if (user) {
-      // await User.deleteOne({ socketId: socket.id });
       user.deleteOne();
-      /* const room = await Room.findOne({ users: user });
-      if (room.users.length <= 1) {
-        Room.deleteOne(room);
-      } else {
-        if (user._id.toString() === room.admin.toString()) {
-          console.log('USER WAS ADMIN');
-          console.log(room.users);
-        }
-      } */
     }
   });
 
