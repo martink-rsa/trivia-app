@@ -1,7 +1,7 @@
 node_modules
 
 # production
-client/build
+build
 
 # misc
 .DS_Store
