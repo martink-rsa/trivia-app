@@ -12,7 +12,7 @@ mongoose.connect(
       console.log(err);
       console.log('MongoDB is not connected');
     } else {
-      // console.log("Connected to MongoDB database:", process.env.MONGODB_URL);
+      console.log('Connected to MongoDB database');
     }
-  },
+  }
 );

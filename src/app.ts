@@ -5,9 +5,6 @@ require('./db/mongoose');
 // Routes
 const index = require('./routes/index');
 
-// Middleware
-const errorHandler = require('./middleware/errorHandler');
-
 const app = express();
 app.use(express.json());
 
@@ -16,7 +13,7 @@ http.createServer(app);
 app.use(function (
   req: express.Request,
   res: express.Response,
-  next: express.NextFunction,
+  next: express.NextFunction
 ) {
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
@@ -25,7 +22,5 @@ app.use(function (
 });
 
 app.use(index);
-
-app.use(errorHandler);
 
 export default app;

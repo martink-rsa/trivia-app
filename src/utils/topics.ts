@@ -3,12 +3,17 @@ import * as schedule from 'node-schedule';
 
 const QUESTIONS_SERVER_URL = process.env.QUESTIONS_SERVER_URL;
 
+type Topic = {
+  id: number;
+  title: string;
+};
+
 /**
  * Holds all the topics and questions as well as provides getters
  * for the topics, only topics and questions
  */
 const Topics = () => {
-  let topics = [];
+  let topics: Topic[] = [];
 
   const getTopics = () => topics;
 

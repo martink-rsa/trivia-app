@@ -122,44 +122,42 @@ serverIo.on('connection', (socket: Socket) => {
       // 1. Check room exists
       // 1.1 If room exists, add user to room
       // 1.2 If room doesn't exist, create room with user as admin
-      let foundRoom: IRoom;
+      let foundRoom: IRoom | null;
       try {
         foundRoom = await Room.findOne({ name: room });
+        if (foundRoom) {
+          // Joining an existing room
+          log.info('Room exists');
+          if (!foundRoom.users.includes(newUser._id)) {
+            foundRoom.users.push(newUser._id);
+            await foundRoom.save();
+            log.info('User added to existing MongoDB room');
+          } else {
+            log.error('User is already added to room');
+            // eslint-disable-next-line node/no-callback-literal
+            return callback({
+              error: 'serverError',
+              info: 'User is already added to the room',
+              field: '',
+            });
+          }
+        } else {
+          // Creating a new room
+          log.info('Room does not exist');
+          const newRoom = new Room({
+            name: room,
+            admin: newUser._id,
+            users: [newUser._id],
+            topic: 'Programming',
+          });
+          await newRoom.save();
+          log.info('User created room');
+          newUser.isAdmin = true;
+          await newUser.save();
+          log.info('User made admin of new room');
+        }
       } catch (error) {
         console.log(error);
-      }
-
-      // let savedRoom;
-      if (foundRoom) {
-        // Joining an existing room
-        log.info('Room exists');
-        if (!foundRoom.users.includes(newUser._id)) {
-          foundRoom.users.push(newUser._id);
-          await foundRoom.save();
-          log.info('User added to existing MongoDB room');
-        } else {
-          log.error('User is already added to room');
-          // eslint-disable-next-line node/no-callback-literal
-          return callback({
-            error: 'serverError',
-            info: 'User is already added to the room',
-            field: '',
-          });
-        }
-      } else {
-        // Creating a new room
-        log.info('Room does not exist');
-        const newRoom = new Room({
-          name: room,
-          admin: newUser._id,
-          users: [newUser._id],
-          topic: 'Programming',
-        });
-        await newRoom.save();
-        log.info('User created room');
-        newUser.isAdmin = true;
-        await newUser.save();
-        log.info('User made admin of new room');
       }
 
       // Socket.io add user to room
@@ -183,7 +181,7 @@ serverIo.on('connection', (socket: Socket) => {
       socket.emit('updateGameState', 'LOBBY');
 
       // Get the players in the room
-      const currentRoom = await (
+      const currentRoom: IRoom | null = await (
         await Room.findOne({ name: room }).populate('users')
       ).execPopulate();
       const { users } = currentRoom.toObject();

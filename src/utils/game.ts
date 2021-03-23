@@ -202,7 +202,9 @@ class Game {
 
     // Cancelling the timer
     player.answers[player.currentQuestion].endTime = Date.now();
-    clearTimeout(player.timer);
+    if (player.timer) {
+      clearTimeout(player.timer);
+    }
 
     // Add the players answer to their answers. Do not need to mark answers atm,
     //    they can be marked on the game over screen. If one wanted to answer after each
@@ -217,7 +219,7 @@ class Game {
     }
   }
 
-  handlePlayerLeaving(playerId): void {
+  handlePlayerLeaving(playerId: string): void {
     const playerIndex = this.players.findIndex(
       (player) => player._id.toString() === playerId.toString()
     );
