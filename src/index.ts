@@ -12,7 +12,7 @@ import Room, { IRoom } from './models/room.model';
 
 import Game from './utils/game';
 
-import Topics from './utils/topics';
+import Topics from './utils/topicsController';
 
 import { getRandomQuestions } from './utils/utils';
 
