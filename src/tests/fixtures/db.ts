@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
-import Room from '../../models/room.model';
-import User from '../../models/user.model';
+import { Room } from '../../models/room.model';
+import { User } from '../../models/user.model';
 
 const userOneId = new mongoose.Types.ObjectId();
 

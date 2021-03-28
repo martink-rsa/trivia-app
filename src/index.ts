@@ -7,8 +7,8 @@ import log from './utils/log';
 
 import Errors from './shared/errors';
 
-import User, { IUser } from './models/user.model';
-import Room, { IRoom } from './models/room.model';
+import { User, IUser } from './models/user.model';
+import { Room, IRoom } from './models/room.model';
 
 import Game from './utils/game';
 
@@ -19,7 +19,11 @@ import { getRandomQuestions } from './utils/utils';
 const PORT = process.env.PORT;
 // const QUESTIONS_SERVER_URL = process.env.QUESTIONS_SERVER_URL;
 
-const games = {};
+type Games = {
+  [key: string]: Game;
+};
+
+const games: Games = {};
 
 const server = http.createServer(app).listen(PORT, () => {
   console.log(`Express server listening on port ${PORT}`);
@@ -110,21 +114,21 @@ serverIo.on('connection', (socket: Socket) => {
       }
 
       // Logging user
-      log('====================================');
+      console.log('====================================');
       log.success(`User Added: ${newUser.username} -> ${room}`);
-      log('------------------------------------');
+      console.log('------------------------------------');
       Object.keys(newUser._doc).forEach((field) =>
-        log(`◦ ${field}: ${newUser._doc[field]}`)
+        console.log(`◦ ${field}: ${newUser._doc[field]}`)
       );
-      log('====================================');
+      console.log('====================================');
 
       // Joining a room
       // 1. Check room exists
       // 1.1 If room exists, add user to room
       // 1.2 If room doesn't exist, create room with user as admin
-      let foundRoom: IRoom | null;
       try {
-        foundRoom = await Room.findOne({ name: room });
+        const foundRoom = await Room.findOne({ name: room });
+        // foundRoom = await Room.findOne({ name: room });
         if (foundRoom) {
           // Joining an existing room
           log.info('Room exists');
@@ -181,22 +185,28 @@ serverIo.on('connection', (socket: Socket) => {
       socket.emit('updateGameState', 'LOBBY');
 
       // Get the players in the room
-      const currentRoom: IRoom | null = await (
-        await Room.findOne({ name: room }).populate('users')
-      ).execPopulate();
-      const { users } = currentRoom.toObject();
+      const currentRoom: IRoom | null = await Room.findOne({ name: room })
+        .populate('users')
+        .exec();
 
-      // Adding 'isAdmin' flag
-      const updatedUsers = users.map((user: IUser) => ({
-        ...user,
-        isAdmin: user._id.toString() === currentRoom.admin.toString(),
-      }));
+      if (currentRoom) {
+        const { users } = currentRoom;
 
-      serverIo.to(room).emit('updatePlayers', updatedUsers);
-      const successMessage = {
-        status: 200,
-      };
-      callback(successMessage);
+        // Adding 'isAdmin' flag
+        const updatedUsers = users.map((user: any) => ({
+          username: user.username,
+          iconId: user.iconId,
+          colorId: user.colorId,
+          socketId: user.socketId,
+          isAdmin: user._id.toString() === currentRoom.admin.toString(),
+        }));
+
+        serverIo.to(room).emit('updatePlayers', updatedUsers);
+        const successMessage = {
+          status: 200,
+        };
+        callback(successMessage);
+      }
     }
   );
 
@@ -304,9 +314,13 @@ serverIo.on('connection', (socket: Socket) => {
 
   socket.on('playerAnswer', async (data: any, callback: any) => {
     const user = await User.findOne({ socketId: socket.id });
-    const room = await Room.findOne({ users: user });
-    const { index } = data;
-    games[room._id].handleAnswer(parseInt(index), user._id);
+    if (user) {
+      const room = await Room.findOne({ users: user });
+      const { index } = data;
+      if (room) {
+        games[room._id].handleAnswer(parseInt(index), user._id);
+      }
+    }
   });
 
   socket.on('backToJoinGame', async () => {

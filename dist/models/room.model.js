@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose = require("mongoose");
-const roomSchema = new mongoose.Schema({
+exports.Room = void 0;
+const mongoose_1 = require("mongoose");
+const RoomSchemaFields = {
     name: {
         type: String,
         required: true,
@@ -10,13 +11,13 @@ const roomSchema = new mongoose.Schema({
         minLength: 5,
     },
     admin: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose_1.Schema.Types.ObjectId,
         required: true,
         ref: 'User',
     },
     users: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose_1.Schema.Types.ObjectId,
             ref: 'User',
         },
     ],
@@ -26,9 +27,10 @@ const roomSchema = new mongoose.Schema({
         trim: true,
     },
     game: {
-        type: mongoose.Schema.Types.Mixed,
+        type: mongoose_1.Schema.Types.Mixed,
     },
-});
-const Room = mongoose.model('Room', roomSchema);
-exports.default = Room;
+};
+const RoomSchema = new mongoose_1.Schema(RoomSchemaFields);
+const Room = mongoose_1.model('Room', RoomSchema);
+exports.Room = Room;
 //# sourceMappingURL=room.model.js.map

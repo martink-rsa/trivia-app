@@ -5,6 +5,7 @@
       "module": "commonjs",
       "outDir": "dist",
       "strict": true,
+      "skipLibCheck": true,
       "sourceMap": true
     },
   "include": ["src/**/*.ts"],

@@ -1,8 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shuffleFisherYates = exports.getRandomQuestions = exports.getRandomNumbers = exports.generateRandomNumber = void 0;
-// import { topics } from '../data/data';
-const topics_1 = require("./topics");
+const topicsController_1 = require("./topicsController");
 /**
  * Generates a random number between the min and max values, with min and max
  * being inclusive
@@ -81,7 +80,7 @@ exports.getRandomNumbers = getRandomNumbers;
  * // returns 10 questions from 'javascript' topic
  */
 const getRandomQuestions = (topic, numberQuestions = 20) => {
-    const topics = topics_1.default.getTopics();
+    const topics = topicsController_1.default.getTopics();
     if (!{}.hasOwnProperty.call(topics, topic)) {
         throw new Error('Topic does not exist');
     }
