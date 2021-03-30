@@ -6,11 +6,11 @@
   "main": "index.js",
   "scripts": {
     "tsc": "tsc",
-    "postinstall": "tsc",
     "dev": "env-cmd -f ./.env.dev nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
-    "start": "node src/index.ts",
+    "start": "node dist/index.js",
     "startdb": "/home/martin/mongodb/bin/mongod --dbpath=/home/martin/mongodb-data",
-    "test": "env-cmd -f ./.env.test jest --config ./jest.config.js --watch --runInBand"
+    "test": "env-cmd -f ./.env.test jest --config ./jest.config.js --watch --runInBand",
+    "deploy": "git add . && git commit -m Heroku && git push heroku master"
   },
   "jest": {
     "testEnvironment": "node"
