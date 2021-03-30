@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1615542266523" clover="3.2.0">
+  <project timestamp="1615542266523" name="All files">
+    <metrics statements="8" coveredstatements="8" conditionals="4" coveredconditionals="2" methods="2" coveredmethods="2" elements="14" coveredelements="12" complexity="0" loc="8" ncloc="8" packages="1" files="1" classes="1"/>
+    <file name="utils.ts" path="/home/martin/rubystack-2.5.6-1/apache2/htdocs/trivia/server/src/utils/utils.ts">
+      <metrics statements="8" coveredstatements="8" conditionals="4" coveredconditionals="2" methods="2" coveredmethods="2"/>
+      <line num="2" count="1" type="stmt"/>
+      <line num="9" count="20" type="cond" truecount="0" falsecount="2"/>
+      <line num="11" count="1" type="stmt"/>
+      <line num="12" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="13" count="1" type="stmt"/>
+      <line num="15" count="1" type="stmt"/>
+      <line num="16" count="1" type="stmt"/>
+      <line num="20" count="1" type="stmt"/>
+    </file>
+  </project>
+</coverage>
