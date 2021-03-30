@@ -11,4 +11,28 @@ Issues:
 1. If the admin player leaves the room, then a new admin will need to be appointed
 2. This does not seem correct: serverIo.to(room).emit('updateGameState', 'LOBBY');
 
-Should it not be just the player having the state updated?
+The design is viewable at: https://www.figma.com/file/UEcKqOJsedP0oq60JypDhV/Main-design
+
+## Tasks
+
+Tasks are available at: https://trello.com/b/EEXohng4/trivia-app
+
+---
+
+## Server
+
+The server uses Node.js and socket.io
+
+### Install
+
+`yarn`
+
+### To run:
+
+Start a local database: `yarn startdb` (Do not close this window)
+
+Start the dev server: `yarn dev` (Do not close this window)
+
+### Tests
+
+`yarn test`
