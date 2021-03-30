@@ -71,9 +71,9 @@ class Game {
             // 2. Delete room
             // 3. Delete game obj
             this.players.forEach(async (player) => {
-                await user_model_1.default.deleteOne({ _id: player._id });
+                await user_model_1.User.deleteOne({ _id: player._id });
             });
-            await room_model_1.default.deleteOne({ name: this.roomName });
+            await room_model_1.Room.deleteOne({ name: this.roomName });
             delete index_1.games[this.roomId];
         }
         else {

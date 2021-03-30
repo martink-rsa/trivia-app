@@ -1,16 +1,18 @@
-import * as mongoose from 'mongoose';
+import { model, Schema, Document } from 'mongoose';
 import Game from '../utils/game';
-// const User = require('./user');
+import { IUser } from './user.model';
 
-export interface IRoom extends mongoose.Document {
+interface IRoom {
   name: string;
-  admin: mongoose.Schema.Types.ObjectId;
-  users: mongoose.Schema.Types.ObjectId[];
+  admin: Schema.Types.ObjectId;
+  users: Schema.Types.ObjectId[] | IUser[];
   topic: string;
   game: Game;
 }
 
-const roomSchema: mongoose.Schema = new mongoose.Schema({
+interface IRoomDoc extends IRoom, Document {}
+
+const RoomSchemaFields: Record<keyof IRoom, any> = {
   name: {
     type: String,
     required: true,
@@ -19,13 +21,13 @@ const roomSchema: mongoose.Schema = new mongoose.Schema({
     minLength: 5,
   },
   admin: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     required: true,
     ref: 'User',
   },
   users: [
     {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'User',
     },
   ],
@@ -35,10 +37,12 @@ const roomSchema: mongoose.Schema = new mongoose.Schema({
     trim: true,
   },
   game: {
-    type: mongoose.Schema.Types.Mixed,
+    type: Schema.Types.Mixed,
   },
-});
+};
 
-const Room = mongoose.model<IRoom>('Room', roomSchema);
+const RoomSchema = new Schema(RoomSchemaFields);
 
-export default Room;
+const Room = model<IRoomDoc>('Room', RoomSchema);
+
+export { Room, IRoom, IRoomDoc };

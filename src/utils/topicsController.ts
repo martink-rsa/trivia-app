@@ -6,14 +6,19 @@ const QUESTIONS_SERVER_URL = process.env.QUESTIONS_SERVER_URL;
 type Topic = {
   id: number;
   title: string;
+  questions: any;
+};
+
+type Topics = {
+  [key: string]: Topic;
 };
 
 /**
  * Holds all the topics and questions as well as provides getters
- * for the topics, only topics and questions
+ * for getting topics, only the topics and only the questions
  */
-const Topics = () => {
-  let topics: Topic[] = [];
+const TopicsController = () => {
+  let topics: Topics = {};
 
   const getTopics = () => topics;
 
@@ -23,7 +28,7 @@ const Topics = () => {
       title: topics[topic].title,
     }));
 
-  const getQuestions = (topic) => topics[topic]?.questions;
+  const getQuestions = (topic: string) => topics[topic]?.questions;
 
   /**
    * Gets the list of topics from the Questions API
@@ -45,9 +50,11 @@ const Topics = () => {
   return { getTopics, getOnlyTopics, getQuestions, updateTopics };
 };
 
-const topics = Topics();
+const topics = TopicsController();
 topics.updateTopics();
 
+// Runs the job once every day, which results in the topics being updated
+//    every day
 schedule.scheduleJob('0 0 * * *', function () {
   topics.updateTopics();
 });

@@ -14,21 +14,16 @@ const log = (() => {
     console.log(chalk.yellow.bold.inverse(' WARNING '), ...params);
   };
 
-  return Object.assign(
-    function (...params: any[]) {
-      console.log.apply(console, arguments);
-    },
-    {
-      info,
-      i: info,
-      error,
-      e: error,
-      success,
-      s: success,
-      warn,
-      w: warn,
-    },
-  );
+  return {
+    info,
+    i: info,
+    error,
+    e: error,
+    success,
+    s: success,
+    warn,
+    w: warn,
+  };
 })();
 
 export default log;

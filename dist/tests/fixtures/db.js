@@ -36,15 +36,15 @@ const mockUsers = [
 ];
 exports.mockUsers = mockUsers;
 const setupDatabase = async () => {
-    await user_model_1.default.deleteMany();
-    await room_model_1.default.deleteMany();
+    await user_model_1.User.deleteMany();
+    await room_model_1.Room.deleteMany();
     // Rooms
     mockRooms.forEach((room) => {
-        new room_model_1.default(room).save();
+        new room_model_1.Room(room).save();
     });
     // Users
     mockUsers.forEach((user) => {
-        new user_model_1.default(user).save();
+        new user_model_1.User(user).save();
     });
 };
 exports.setupDatabase = setupDatabase;

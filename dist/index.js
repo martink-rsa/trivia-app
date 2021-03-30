@@ -10,10 +10,9 @@ const errors_1 = require("./shared/errors");
 const user_model_1 = require("./models/user.model");
 const room_model_1 = require("./models/room.model");
 const game_1 = require("./utils/game");
-const topics_1 = require("./utils/topics");
+const topicsController_1 = require("./utils/topicsController");
 const utils_1 = require("./utils/utils");
 const PORT = process.env.PORT;
-// const QUESTIONS_SERVER_URL = process.env.QUESTIONS_SERVER_URL;
 const games = {};
 exports.games = games;
 const server = http.createServer(app_1.default).listen(PORT, () => {
@@ -79,7 +78,7 @@ serverIo.on('connection', (socket) => {
         // Adding the user
         let newUser;
         try {
-            const user = new user_model_1.default({
+            const user = new user_model_1.User({
                 username,
                 room,
                 iconId,
@@ -96,18 +95,18 @@ serverIo.on('connection', (socket) => {
             return callback(errors_1.default.unknownErrorUsername);
         }
         // Logging user
-        log_1.default('====================================');
+        console.log('====================================');
         log_1.default.success(`User Added: ${newUser.username} -> ${room}`);
-        log_1.default('------------------------------------');
-        Object.keys(newUser._doc).forEach((field) => log_1.default(`◦ ${field}: ${newUser._doc[field]}`));
-        log_1.default('====================================');
+        console.log('------------------------------------');
+        Object.keys(newUser._doc).forEach((field) => console.log(`◦ ${field}: ${newUser._doc[field]}`));
+        console.log('====================================');
         // Joining a room
         // 1. Check room exists
         // 1.1 If room exists, add user to room
         // 1.2 If room doesn't exist, create room with user as admin
-        let foundRoom;
         try {
-            foundRoom = await room_model_1.default.findOne({ name: room });
+            const foundRoom = await room_model_1.Room.findOne({ name: room });
+            // foundRoom = await Room.findOne({ name: room });
             if (foundRoom) {
                 // Joining an existing room
                 log_1.default.info('Room exists');
@@ -129,7 +128,7 @@ serverIo.on('connection', (socket) => {
             else {
                 // Creating a new room
                 log_1.default.info('Room does not exist');
-                const newRoom = new room_model_1.default({
+                const newRoom = new room_model_1.Room({
                     name: room,
                     admin: newUser._id,
                     users: [newUser._id],
@@ -159,23 +158,30 @@ serverIo.on('connection', (socket) => {
                 field: '',
             });
         }
-        const topics = topics_1.default.getOnlyTopics();
+        const topics = topicsController_1.default.getOnlyTopics();
         socket.emit('updateTopics', topics);
         // Updating game state for user
         socket.emit('updateGameState', 'LOBBY');
         // Get the players in the room
-        const currentRoom = await (await room_model_1.default.findOne({ name: room }).populate('users')).execPopulate();
-        const { users } = currentRoom.toObject();
-        // Adding 'isAdmin' flag
-        const updatedUsers = users.map((user) => ({
-            ...user,
-            isAdmin: user._id.toString() === currentRoom.admin.toString(),
-        }));
-        serverIo.to(room).emit('updatePlayers', updatedUsers);
-        const successMessage = {
-            status: 200,
-        };
-        callback(successMessage);
+        const currentRoom = await room_model_1.Room.findOne({ name: room })
+            .populate('users')
+            .exec();
+        if (currentRoom) {
+            const { users } = currentRoom;
+            // Adding 'isAdmin' flag
+            const updatedUsers = users.map((user) => ({
+                username: user.username,
+                iconId: user.iconId,
+                colorId: user.colorId,
+                socketId: user.socketId,
+                isAdmin: user._id.toString() === currentRoom.admin.toString(),
+            }));
+            serverIo.to(room).emit('updatePlayers', updatedUsers);
+            const successMessage = {
+                status: 200,
+            };
+            callback(successMessage);
+        }
     });
     socket.on('gameStart', async (data, callback) => {
         // * Only want admin to trigger the game starting
@@ -192,7 +198,7 @@ serverIo.on('connection', (socket) => {
         const { selectedTopic, numberQuestions, questionsDuration } = data;
         log_1.default.info('Topic:', selectedTopic, 'questions:', numberQuestions, 'duration:', questionsDuration);
         // Validation: Topics
-        const topics = topics_1.default.getOnlyTopics();
+        const topics = topicsController_1.default.getOnlyTopics();
         const isTopic = topics.reduce((foundTopic, topic) => {
             if (topic.id === selectedTopic) {
                 foundTopic = true;
@@ -220,13 +226,13 @@ serverIo.on('connection', (socket) => {
         }
         try {
             // Get the user using socket.io id
-            const user = await user_model_1.default.findOne({ socketId: socket.id });
+            const user = await user_model_1.User.findOne({ socketId: socket.id });
             if (!user) {
                 return callback(errors_1.default.incorrectUserStartGame);
             }
             // Find the room the player is in. This is needed to check the player
             // is admin, but also later to emit to this room
-            const room = await room_model_1.default.findOne({ users: user }).populate('users');
+            const room = await room_model_1.Room.findOne({ users: user }).populate('users');
             if (!room) {
                 return callback(errors_1.default.incorrectUserStartGame);
             }
@@ -260,10 +266,14 @@ serverIo.on('connection', (socket) => {
         }
     });
     socket.on('playerAnswer', async (data, callback) => {
-        const user = await user_model_1.default.findOne({ socketId: socket.id });
-        const room = await room_model_1.default.findOne({ users: user });
-        const { index } = data;
-        games[room._id].handleAnswer(parseInt(index), user._id);
+        const user = await user_model_1.User.findOne({ socketId: socket.id });
+        if (user) {
+            const room = await room_model_1.Room.findOne({ users: user });
+            const { index } = data;
+            if (room) {
+                games[room._id].handleAnswer(parseInt(index), user._id);
+            }
+        }
     });
     socket.on('backToJoinGame', async () => {
         serverIo.emit('updateGameState', 'JOIN');
@@ -278,7 +288,7 @@ serverIo.on('connection', (socket) => {
         // 2. Update room player list
         // 4. If no players left, delete MongoDB room and sockets.io room
         console.log('Server: - Disconnected ID:', socket.id);
-        const user = await user_model_1.default.findOne({ socketId: socket.id });
+        const user = await user_model_1.User.findOne({ socketId: socket.id });
         if (user) {
             user.deleteOne();
         }

@@ -14,9 +14,7 @@ const log = (() => {
     const warn = (...params) => {
         console.log(chalk.yellow.bold.inverse(' WARNING '), ...params);
     };
-    return Object.assign(function (...params) {
-        console.log.apply(console, arguments);
-    }, {
+    return {
         info,
         i: info,
         error,
@@ -25,7 +23,7 @@ const log = (() => {
         s: success,
         warn,
         w: warn,
-    });
+    };
 })();
 exports.default = log;
 //# sourceMappingURL=log.js.map

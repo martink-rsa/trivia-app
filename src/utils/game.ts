@@ -1,7 +1,7 @@
-import User from '../models/user.model';
+import { User } from '../models/user.model';
 import { serverIo, games } from '../index';
 import { shuffleFisherYates } from '../utils/utils';
-import Room from '../models/room.model';
+import { Room } from '../models/room.model';
 
 type Config = {
   roomId: string;

@@ -1,6 +1,4 @@
-import axios from 'axios';
-// import { topics } from '../data/data';
-import Topics from './topics';
+import Topics from './topicsController';
 
 /**
  * Generates a random number between the min and max values, with min and max
@@ -56,7 +54,7 @@ function shuffleFisherYates(arrayToShuffle: any) {
 const getRandomNumbers = (
   minimumValue: number,
   maximumValue: number,
-  totalNumbers: number,
+  totalNumbers: number
 ) => {
   // Creating an array of random numbers by shuffling:
   // 1. Create an array of all numbers in range e.g. min 1, max 5, [1, 2, 3, 4, 5]
@@ -65,7 +63,7 @@ const getRandomNumbers = (
   const range = maximumValue - minimumValue + 1;
   if (totalNumbers > range) {
     throw new Error(
-      'The number of questions expected are greater than the range of numbers.',
+      'The number of questions expected are greater than the range of numbers.'
     );
   }
 
@@ -73,7 +71,7 @@ const getRandomNumbers = (
   // [1, 2, 3, 4, 5] or [3, 4, 5]
   const arrayOfNumbers = Array.from(
     { length: range },
-    (_, index: number) => index + minimumValue,
+    (_, index: number) => index + minimumValue
   );
 
   // Shuffles the generated array
